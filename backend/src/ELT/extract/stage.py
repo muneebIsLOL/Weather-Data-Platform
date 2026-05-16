@@ -43,7 +43,7 @@ def stage_data(data: dict):
     return {
         "current_conditions": "weather_current_raw",
         "hourly_conditions": "weather_hourly_raw",
-        "daily_conditions": "weather_daily_raws",
+        "daily_conditions": "weather_daily_raw",
         "metadata": "weather_metadata",
         "units": "weather_units"
     }
