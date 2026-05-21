@@ -2,30 +2,29 @@ from src.db.postgres import engine
 import pandas as pd
 import datetime
 import numpy as np
+from src.ELT.config.constants import WEATHER_CODES, cardinal_directions
 
-
-def load_raw(schema_reference: dict, engine):
+def load_raw(raw_schema_reference: dict, engine):
     data = {}
-    for key, value in schema_reference.items():
+    for key, value in raw_schema_reference.items():
         data[key] = pd.read_sql(f"SELECT * FROM {value}", engine)
-
     return data
 
 
-schema_ref = {
-    "current_conditions": "weather_current_raw",
-    "hourly_conditions": "weather_hourly_raw",
-    "daily_conditions": "weather_daily_raw",
-    "metadata": "weather_metadata",
-    "units": "weather_units",
-}
+# raw_schema_reference = {
+#     "current_conditions": "weather_current_raw",
+#     "hourly_conditions": "weather_hourly_raw",
+#     "daily_conditions": "weather_daily_raw",
+#     "metadata": "weather_metadata",
+#     "units": "weather_units_raw",
+# }
 
-data = load_raw(schema_ref, engine)
+# data = load_raw(raw_schema_reference, engine)
 
 def clean_data(data: dict):
-    for value in data.values():
+    for key, value in data.items():
+        data[key] = value.drop(columns="id")
         if isinstance(value, pd.DataFrame):
-            value["id"] = value["id"].ffill()
             if "time" in value.columns:
                 value["time"] = value["time"].fillna(datetime.datetime.now())
                 value["time"] = pd.to_datetime(value["time"])
@@ -42,11 +41,29 @@ def clean_data(data: dict):
     for units in [current_units, hourly_units, daily_units]:
         units = units.ffill()
 
+    for key, df in data.items():
+        if isinstance(df, pd.DataFrame) and "time" in df.columns:
+
+            df["time"] = pd.to_datetime(df["time"])
+
+            df = (
+                df.sort_values("time")
+                    .drop_duplicates(subset=["time"], keep="last")
+                    .reset_index(drop=True)
+            )
+
+            df["time"] = (
+                pd.to_datetime(df["time"], utc=True)
+                .dt.floor("min")
+            )
+
+            data[key] = df
+
     hourly_conditions["apparent_temperature"] = hourly_conditions[
         "apparent_temperature"
     ].fillna(hourly_conditions["temperature_2m"])
 
-    current_conditions["interval"] = current_conditions["interval"].ffill()
+    current_conditions = current_conditions.drop(columns="interval")
 
     cols = [
         "apparent_temperature",
@@ -81,69 +98,20 @@ def clean_data(data: dict):
 
     del data["units"]
 
+    data["current_conditions"] = current_conditions
+    data["hourly_conditions"] = hourly_conditions
+    data["daily_conditions"] = daily_conditions
+    data["metadata"] = metadata
     data["current_units"] = current_units
     data["hourly_units"] = hourly_units
     data["daily_units"] = daily_units
 
     return data
 
-
-print(clean_data(data))
-
-
 def column_mapping(data: dict):
     current_conditions = data["current_conditions"]
     hourly_conditions = data["hourly_conditions"]
-
-    WEATHER_CODES = {
-        0: "Clear sky",
-        1: "Mainly clear",
-        2: "Partly cloudy",
-        3: "Overcast",
-        45: "Fog",
-        48: "Depositing rime fog",
-        51: "Light drizzle",
-        53: "Moderate drizzle",
-        55: "Dense drizzle",
-        56: "Light freezing drizzle",
-        57: "Dense freezing drizzle",
-        61: "Slight rain",
-        63: "Moderate rain",
-        65: "Heavy rain",
-        66: "Light freezing rain",
-        67: "Heavy freezing rain",
-        71: "Slight snow fall",
-        73: "Moderate snow fall",
-        75: "Heavy snow fall",
-        77: "Snow grains",
-        80: "Slight rain showers",
-        81: "Moderate rain showers",
-        82: "Violent rain showers",
-        85: "Slight snow showers",
-        86: "Heavy snow showers",
-        95: "Thunderstorm",
-        96: "Thunderstorm with slight hail",
-        99: "Thunderstorm with heavy hail",
-    }
-
-    cardinal_directions = [
-        "N",
-        "NNE",
-        "NE",
-        "ENE",
-        "E",
-        "ESE",
-        "SE",
-        "SSE",
-        "S",
-        "SSW",
-        "SW",
-        "WSW",
-        "W",
-        "WNW",
-        "NW",
-        "NNW",
-    ]
+    metadata = data["metadata"]
 
     for conditions in [current_conditions, hourly_conditions]:
         conditions["feels_like"] = (
@@ -157,6 +125,10 @@ def column_mapping(data: dict):
         lambda x: cardinal_directions[x]
     ).astype("category").fillna("UNKNOWN")
 
+    data["current_conditions"] = current_conditions
+    data["hourly_conditions"] = hourly_conditions
+    data["metadata"] = metadata
+
     return data
 
 
@@ -166,8 +138,6 @@ def normalize(data: dict):
         data["hourly_conditions"],
         data["daily_conditions"],
     ]:
-        value["id"] = value["id"].astype("int8")
-
         if "time" in value.columns:
             value["time"] = pd.to_datetime(value["time"])
 
@@ -179,10 +149,54 @@ def normalize(data: dict):
 
     current_conditions = data["current_conditions"]
     hourly_conditions = data["hourly_conditions"]
+    daily_conditions = data["daily_conditions"]
+
+    current_conditions["is_day"] = current_conditions["is_day"].astype("category")
+
+    daily_conditions["uv_index_max"] = daily_conditions["uv_index_max"].astype(float)
 
     for value in [current_conditions, hourly_conditions]:
         value["relative_humidity_2m"] = value["relative_humidity_2m"].astype(np.float16)
         value["weather_code"] = value["weather_code"].astype(int)
         value["wind_speed_10m"] = value["wind_speed_10m"].astype(np.float16)        
 
+    data["current_conditions"] = current_conditions
+    data["hourly_conditions"] = hourly_conditions
+    data["daily_conditions"] = daily_conditions
+
     return data
+
+def save_data(data: dict):
+    for key, value in data.items():
+       value.to_parquet(
+           f"backend/src/ELT/temp/{key}.parquet",
+            index=False
+       ) 
+
+def transform_data(raw_schema_reference: dict, engine):
+    try:
+        data = load_raw(raw_schema_reference, engine)
+        
+        cleaned_data = clean_data(data)
+
+        transformed_data = column_mapping(cleaned_data)
+
+        normalized_data = normalize(transformed_data)
+
+        save_data(normalized_data)
+
+        transformed_schema_reference = {
+            "current_conditions": "current_conditions",
+            "hourly_conditions": "hourly_conditions",
+            "daily_conditions": "daily_conditions",
+            "metadata": "metadata",
+            "current_units": "current_units",
+            "hourly_units": "hourly_units",
+            "daily_units": "daily_units"
+        }
+
+        return normalized_data, transformed_schema_reference
+
+    except Exception as e:
+        print("Data Transformation Error:")
+        raise e
