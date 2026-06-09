@@ -1,8 +1,7 @@
 from pydantic import BaseModel
-from datetime import datetime
 
 class HourlyConditionsResponse(BaseModel):
-    time: datetime
+    time: str
     temperature_2m: float
     relative_humidity_2m: float
     dew_point_2m: float
@@ -15,3 +14,4 @@ class HourlyConditionsResponse(BaseModel):
     wind_direction_10m: float
     feels_like: str
     wind_direction_cardinal: str
+    is_day: int
