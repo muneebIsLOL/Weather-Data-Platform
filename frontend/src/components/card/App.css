@@ -1,0 +1,265 @@
+.card-layout {
+    top: 0;
+    position: absolute;
+    height: 97.8%;
+    width: 61%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.card-wrapper {
+    width: 100%;
+    background: var(--gradient);
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.3s all;
+    padding-top: 10px;
+}
+
+.card-layout.grow .card-wrapper {
+    height: 80%;
+}
+
+.card-layout.collapse .card-wrapper {
+    height: 45%;
+}
+
+.card {
+    width: 95%;
+    height: 95%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card-layout.collapse .card {
+    justify-content: center;
+}
+
+.card-layout.grow .card {
+    white-space: nowrap;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.card-layout.collapse .daily-conditions,
+.card-layout.collapse .today-conditions, 
+.card-layout.collapse .day-night-time-container {
+    opacity: 0;
+    display: none;
+    transition: 0.3s opacity, 0.5s display;
+}
+
+.card h3 {
+    color: var(--primary-color);
+    margin: 5px;
+}
+
+.card-toggle {
+    padding: 0.2rem 2rem;
+    background-color: var(--focus-bg);
+    border-radius: 20px;
+    cursor: pointer;
+    display: block;
+    margin: 2px;
+}
+
+.card-layout.grow .card-toggle {
+    position: fixed;
+}
+
+.hourly-conditions {
+    width: 100%;
+    min-height: 200px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.hourly-item {
+    display: flex;
+    gap: 2rem;
+    width: 100%;
+    height: 50%;
+}
+
+.hourly-conditions::-webkit-scrollbar,
+.card-layout.grow .card::-webkit-scrollbar {
+    width: 2px;
+    height: 4px;
+}
+
+.hourly-conditions::-webkit-scrollbar-track,
+.card-layout.grow .card::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+}
+
+.hourly-conditions::-webkit-scrollbar-thumb,
+.card-layout.grow .card::-webkit-scrollbar-thumb {
+    background-color: rgb(153, 153, 153, 0.3);
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    transition: 0.3s all;
+}
+
+.hourly-conditions::-webkit-scrollbar-thumb:hover,
+.card-layout.grow .card::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+.hourly-item .item {
+    text-align: center;
+    flex: 0 0 80px;
+    width: 80px;
+}
+
+.hourly-item .item * {
+    margin-top: 1rem;
+}
+
+.hourly-chart {
+    width: 100%;
+    display: block;
+}
+
+.feels-like-icon {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+}
+
+.time {
+    color: #777;
+    font-family: Raleway;
+    font-size: 0.8rem;
+}
+
+.hourly-item h3 {
+    font-size: 2rem;
+    font-family: "Open Sans", sans-serif;
+    font-weight: 500;
+}
+
+.daily-conditions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 60%;
+    transition: 0.3s all;
+}
+
+.daily-item {
+    display: flex;
+    justify-content: space-between;
+    font-family: "Open Sans";
+}
+
+.daily-item {
+    color: var(--primary-color);
+}
+
+.forecast-time {
+    font-weight: 800;
+}
+
+.today-conditions {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 99%;
+}
+
+.today-conditions div {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 150px;
+    width: 200px;
+    background-color: var(--bg-secondary);
+    border-radius: 20px;
+    padding: 15px;
+    flex: 1 1 200px;
+    border: 1px solid var(--border-color);
+}
+
+.variable-header {
+    color: var(--secondary-color);
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.today-conditions h1 {
+    color: var(--primary-color);
+}
+
+.conditions-container {
+    padding: 2rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.conditions-container:last-of-type {
+    border: none;
+}
+
+.day-night-time-container {
+    width: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.timings {
+    display: flex;
+    width: 90%;
+    justify-content: space-between;
+}
+
+.timings div {
+    text-align: center;
+}
+
+.timings h1 {
+    color: var(--primary-color);
+    font-family: sans-serif;
+    letter-spacing: 2px;
+}
+
+.timings p {
+    color: var(--secondary-color);
+}
+
+@media (max-width: 1100px) {
+
+    .card-layout,
+    .card-wrapper {
+        width: 100%;
+        height: 100%;
+    }
+
+    .card-layout {
+        justify-content: flex-start;
+        right: 0;
+
+    }
+
+    .card-wrapper {
+        border-radius: 0;
+    }
+}
+
+@media (max-width:600px) {
+
+    .daily-conditions,
+    .day-night-time-container {
+        width: 90%;
+    }
+}
