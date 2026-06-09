@@ -1,7 +1,6 @@
 from src.api.services.weather_service import get_current
 from src.api.models.current_conditions import CurrentConditionsResponse
 from fastapi import APIRouter
-from typing import List
 
 
 router = APIRouter()
