@@ -1,11 +1,10 @@
 from pydantic import BaseModel
-from datetime import datetime
 
 class DailyConditionsResponse(BaseModel):
-    time: datetime
+    time: str
     temperature_2m_max: float
     temperature_2m_min: float
-    sunrise: datetime
-    sunset: datetime
+    sunrise: str
+    sunset: str
     uv_index_max: float
 
