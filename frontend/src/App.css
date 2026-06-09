@@ -1,0 +1,62 @@
+main {
+    width: 100%;
+}
+
+.current-conditions {
+    height: 40%;
+}
+
+.basic-metrics {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* margin-top: 2rem; */
+}
+
+.basic-metrics .temperature {
+    font-size: 12rem;
+    background: linear-gradient(180deg,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(255, 255, 255, 0.6) 50%,
+            rgba(255, 255, 255, 0) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.feels-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 35px;
+}
+
+.basic-metrics .feels-like {
+    writing-mode: sideways-lr;
+    text-orientation: mixed;
+    white-space: nowrap;
+    font-size: 1.4rem;
+    font-weight: 400;
+    letter-spacing: 4px;
+}
+
+.icon {
+    font-size: 1.4rem;
+}
+
+.icon-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+@media (max-width:550px) {
+    .basic-metrics .temperature {
+        font-size: 10rem;
+    }
+
+    .basic-metrics .feels-like {
+        letter-spacing: 2px;
+    }
+}
