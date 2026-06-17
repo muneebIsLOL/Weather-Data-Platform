@@ -1,25 +1,13 @@
-from src.db.postgres import engine
 import pandas as pd
 import datetime
 import numpy as np
-from src.ELT.config.constants import WEATHER_CODES, cardinal_directions
+from ELT.config.constants import WEATHER_CODES, cardinal_directions
 
 def load_raw(raw_schema_reference: dict, engine):
     data = {}
     for key, value in raw_schema_reference.items():
         data[key] = pd.read_sql(f"SELECT * FROM {value}", engine)
     return data
-
-
-# raw_schema_reference = {
-#     "current_conditions": "weather_current_raw",
-#     "hourly_conditions": "weather_hourly_raw",
-#     "daily_conditions": "weather_daily_raw",
-#     "metadata": "weather_metadata",
-#     "units": "weather_units_raw",
-# }
-
-# data = load_raw(raw_schema_reference, engine)
 
 def clean_data(data: dict):
     for key, value in data.items():
@@ -123,7 +111,7 @@ def column_mapping(data: dict):
     idx = (((hourly_conditions["wind_direction_10m"] + 11.25) // 22.5) % 16).astype(int)
     hourly_conditions["wind_direction_cardinal"] = idx.apply(
         lambda x: cardinal_directions[x]
-    ).astype("category").fillna("UNKNOWN")
+    ).fillna("UNKNOWN").astype("category")
 
     data["current_conditions"] = current_conditions
     data["hourly_conditions"] = hourly_conditions
@@ -169,7 +157,7 @@ def normalize(data: dict):
 def save_data(data: dict):
     for key, value in data.items():
        value.to_parquet(
-           f"backend/src/ELT/temp/{key}.parquet",
+           f"./src/ELT/temp/{key}.parquet",
             index=False
        ) 
 
