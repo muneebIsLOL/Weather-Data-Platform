@@ -1,0 +1,17 @@
+# Docker related files
+Dockerfile
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Git related files
+README.md
+.gitignore
