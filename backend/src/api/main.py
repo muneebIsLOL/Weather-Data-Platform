@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from src.api.routes.current_weather import router as current_weather_router
-from src.api.routes.hourly_weather import router as hourly_weather_router
-from src.api.routes.daily_weather import router as daily_weather_router
-from src.api.dependencies.auth import login
+from routes.current_weather import router as current_weather_router
+from routes.hourly_weather import router as hourly_weather_router
+from routes.daily_weather import router as daily_weather_router
+from dependencies.auth import login
 from fastapi_limiter.depends import RateLimiter
 from pyrate_limiter import Duration, Limiter, Rate
 
