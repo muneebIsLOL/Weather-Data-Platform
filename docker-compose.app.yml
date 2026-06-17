@@ -1,0 +1,95 @@
+services:
+  elt-db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: "Saleem"
+      POSTGRES_PASSWORD: "Cubecraft@123_5313830"
+      POSTGRES_DB: elt_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/src/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U Saleem -d elt_db"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+    restart: always
+    networks:
+      - db-shared-net
+
+  api:
+    image: weather-api:1.0
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      AUTH_ACCESS_TOKEN: Cubecraft
+      POSTGRES_USER: "Saleem"
+      POSTGRES_PASSWORD: "Cubecraft@123_5313830"
+      POSTGRES_DB: elt_db
+    ports:
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "curl http://127.0.0.1:8000/ || >/dev/null"]
+      interval: 15s
+      retries: 2
+      start_period: 3s
+    restart: always
+    networks:
+      - db-shared-net
+      - api-internal-net
+    volumes:
+      - ./backend/src/db/postgres.py:/app/postgres.py
+    depends_on:
+      elt-db:
+        condition: service_healthy
+    develop:
+      watch:
+        - path: ./backend/src/api
+          target: /app
+          action: sync
+
+        - path: ./requirements/api.txt
+          action: rebuild
+        - path: ./requirements/base.txt
+          action: rebuild
+
+  web:
+    image: weather-web:1.0
+    build:
+      context: .
+      dockerfile: frontend/dockerfile
+    ports:
+      - "127.0.0.1:5173:5173"
+    healthcheck:
+      test: ["CMD-SHELL", "curl http://127.0.0.1:5173 >/dev/null"]
+      interval: 15s
+      retries: 2
+      start_period: 3s
+    restart: always
+    depends_on:
+      api:
+        condition: service_healthy
+    develop:
+      watch:
+        - path: ./frontend/src/
+          target: /app
+          action: sync
+
+        - path: ./package.json
+          action: rebuild
+        - path: ./package-lock.json
+          action: rebuild
+    networks:
+      - api-internal-net
+
+networks:
+  db-shared-net:
+    external: true
+    driver: bridge
+
+  api-internal-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
