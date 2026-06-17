@@ -1,6 +1,6 @@
 import pandas as pd
 from sqlalchemy.dialects.postgresql import JSONB
-from src.ELT.utilities.upsert import upsert_df
+from ELT.utilities.upsert import upsert_df
 
 def stage_data(data: dict, engine):
     current_conditions = pd.DataFrame([data["current_conditions"]])
