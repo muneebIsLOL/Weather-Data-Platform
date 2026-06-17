@@ -1,5 +1,5 @@
-from src.api.services.weather_service import get_current
-from src.api.models.current_conditions import CurrentConditionsResponse
+from services.weather_service import get_current
+from models.current_conditions import CurrentConditionsResponse
 from fastapi import APIRouter
 
 

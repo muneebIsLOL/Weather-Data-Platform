@@ -1,5 +1,5 @@
-from src.api.services.weather_service import get_today, get_daily_forecast
-from src.api.models.daily_conditions import DailyConditionsResponse
+from services.weather_service import get_today, get_daily_forecast
+from models.daily_conditions import DailyConditionsResponse
 from typing import List
 from fastapi import APIRouter
 

@@ -1,5 +1,5 @@
-from src.api.services.weather_service import get_hourly
-from src.api.models.hourly_conditions import HourlyConditionsResponse
+from services.weather_service import get_hourly
+from models.hourly_conditions import HourlyConditionsResponse
 from fastapi import APIRouter
 from typing import List
 
