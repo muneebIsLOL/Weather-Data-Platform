@@ -1,4 +1,4 @@
-from src.db.postgres import engine
+from postgres import engine
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
@@ -77,17 +77,17 @@ def get_hourly():
 
 
 def get_today():
-    today_weather = daily[pd.to_datetime(daily["time"]).dt.date == now]
+    today_weather = daily[pd.to_datetime(daily["time"]).dt.date == now].copy()
     today_weather = today_weather.drop(columns="id")
 
     for col in ["time", "sunrise", "sunset"]:
+        today_weather[col] = pd.to_datetime(today_weather[col])
         today_weather[col] = (
-            today_weather[col].dt.tz_convert("Asia/Karachi").dt.strftime("%H:%M")
+            today_weather[col]
+            .dt.strftime("%H:%M")
         )
 
-    today_weather = today_weather.to_dict(orient="records")
-
-    return today_weather
+    return today_weather.to_dict(orient="records")
 
 
 def get_daily_forecast():
