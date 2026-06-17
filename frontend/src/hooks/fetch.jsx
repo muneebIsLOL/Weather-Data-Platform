@@ -9,7 +9,7 @@ function useFetch(endpoint) {
         setLoading(true);
         setError(null);
 
-        fetch(`http://192.168.1.37:8000/${endpoint}`, {
+        fetch(`http://localhost:8000/${endpoint}`, {
             headers: { token: "Cubecraft" }
         })
             .then(res => {
