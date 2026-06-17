@@ -1,8 +1,8 @@
-import pandas as pd
 import pandera.pandas as pa
 from pandera.typing.pandas import Series
-from src.ELT.config.constants import WEATHER_CODES, cardinal_directions
+from ELT.config.constants import WEATHER_CODES, cardinal_directions
 import datetime
+
 
 class CurrentConditions(pa.DataFrameModel):
     time: Series[datetime.datetime] = pa.Field(unique=True)
@@ -13,7 +13,10 @@ class CurrentConditions(pa.DataFrameModel):
     weather_code: Series[int] = pa.Field(isin=list(WEATHER_CODES.keys()))
     wind_speed_10m: Series[pa.Float16] = pa.Field(ge=0, le=400)
     surface_pressure: Series[float] = pa.Field(ge=700, le=1100)
-    feels_like: Series[pa.Category] = pa.Field(isin=list(WEATHER_CODES.values()), raise_warning=True)
+    feels_like: Series[pa.Category] = pa.Field(
+        isin=list(WEATHER_CODES.values()), raise_warning=True
+    )
+
 
 class HourlyConditions(pa.DataFrameModel):
     time: Series[datetime.datetime] = pa.Field(unique=True)
@@ -34,13 +37,11 @@ class HourlyConditions(pa.DataFrameModel):
     wind_direction_10m: Series[float] = pa.Field(ge=0, le=360)
 
     feels_like: Series[pa.Category] = pa.Field(
-        isin=list(WEATHER_CODES.values()),
-        nullable=True
+        isin=list(WEATHER_CODES.values()), nullable=True
     )
 
-    wind_direction_cardinal: Series[pa.Category] = pa.Field(
-        isin=cardinal_directions
-    )
+    wind_direction_cardinal: Series[pa.Category] = pa.Field(isin=cardinal_directions)
+
 
 class DailyConditions(pa.DataFrameModel):
     time: Series[datetime.datetime] = pa.Field(unique=True)
@@ -52,6 +53,7 @@ class DailyConditions(pa.DataFrameModel):
     sunset: Series[datetime.datetime]
 
     uv_index_max: Series[float] = pa.Field(ge=0, le=20)
+
 
 class Metadata(pa.DataFrameModel):
     time: Series[datetime.datetime] = pa.Field(unique=True)
@@ -68,6 +70,7 @@ class Metadata(pa.DataFrameModel):
 
     elevation: Series[float] = pa.Field(ge=-500, le=9000)
 
+
 class CurrentUnits(pa.DataFrameModel):
     time: Series[str]
 
@@ -81,6 +84,7 @@ class CurrentUnits(pa.DataFrameModel):
     surface_pressure: Series[str]
 
     apparent_temperature: Series[str]
+
 
 class HourlyUnits(pa.DataFrameModel):
     time: Series[str]
@@ -99,6 +103,7 @@ class HourlyUnits(pa.DataFrameModel):
     relative_humidity_2m: Series[str]
     precipitation_probability: Series[str]
 
+
 class DailyUnits(pa.DataFrameModel):
     time: Series[str]
 
@@ -110,14 +115,21 @@ class DailyUnits(pa.DataFrameModel):
     temperature_2m_max: Series[str]
     temperature_2m_min: Series[str]
 
+
 def schema_validate(data: dict):
     try:
-        print(data)
-        for (key, value), validation in zip(data.items(), [CurrentConditions, HourlyConditions, DailyConditions, Metadata, CurrentUnits, HourlyUnits, DailyUnits]):
-            print(key)
-            print(value)
-            data[key] = validation(value)
+        validators = {
+            "metadata": Metadata,
+            "current_conditions": CurrentConditions,
+            "hourly_conditions": HourlyConditions,
+            "daily_conditions": DailyConditions,
+            "current_units": CurrentUnits,
+            "hourly_units": HourlyUnits,
+            "daily_units": DailyUnits,
+        }
 
+        for key, value in data.items():
+            data[key] = validators[key](value)
         return data
     except Exception as e:
         print("Schema Validation Error:")
