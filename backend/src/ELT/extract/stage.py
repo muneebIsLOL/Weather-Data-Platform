@@ -1,6 +1,6 @@
 import pandas as pd
 from sqlalchemy.dialects.postgresql import JSONB
-from ELT.utilities.upsert import upsert_df
+from src.ELT.utilities.upsert import upsert_df
 
 def stage_data(data: dict, engine):
     current_conditions = pd.DataFrame([data["current_conditions"]])
@@ -23,14 +23,6 @@ def stage_data(data: dict, engine):
         index=False,
         dtype={"current_units": JSONB, "hourly_units": JSONB, "daily_units": JSONB},
     )
-
-    # hourly_conditions.to_sql(
-    #     "weather_hourly_raw", engine, if_exists="append", index=False
-    # )
-
-    # daily_conditions.to_sql(
-    #     "weather_daily_raw", engine, if_exists="append", index=False
-    # )
 
     upsert_df(current_conditions, "weather_current_raw", engine)
 
