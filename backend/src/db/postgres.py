@@ -3,15 +3,18 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from urllib.parse import quote_plus
 
+def get_engine(env_file=None):
+    load_dotenv(env_file)
 
-load_dotenv()
+    USERNAME = os.getenv("POSTGRES_USER")
+    PASSWORD = os.getenv("POSTGRES_PASSWORD")
+    PASSWORD = quote_plus(PASSWORD)
+    HOST = os.getenv("POSTGRES_HOST", "elt-db")
+    DB = os.getenv("POSTGRES_DB")
+    PORT = 5432
 
-USERNAME = os.getenv("POSTGRES_USER")
-PASSWORD = os.getenv("POSTGRES_PASSWORD")
-PASSWORD = quote_plus(PASSWORD)
-HOST = os.getenv("POSTGRES_HOST", "elt-db")
-PORT = 5432
+    engine = create_engine(
+        f"postgresql+psycopg2://{USERNAME}:{PASSWORD}@{HOST}:{PORT}/{DB}"
+    )
 
-engine = create_engine(
-    f"postgresql+psycopg2://{USERNAME}:{PASSWORD}@{HOST}:5432/elt_db"
-)
+    return engine
