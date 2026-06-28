@@ -1,19 +1,12 @@
-import sys
-from pathlib import Path
-
-backend_dir = Path("/opt/airflow/src")
-if str(backend_dir) not in sys.path:
-    sys.path.insert(0, str(backend_dir))
-
-from airflow.sdk import dag, task
 import pendulum, datetime
-from ELT.extract.data import extract_data
-from ELT.extract.stage import stage_data
-from ELT.transform import transform_data
-from ELT.load import load_data
-from ELT.validation.business import BusinessValidation
-from ELT.validation.schema import schema_validate
-from db.postgres import engine
+from src.ELT.extract.data import extract_data
+from src.ELT.extract.stage import stage_data
+from src.ELT.transform import transform_data
+from src.ELT.load import load_data
+from src.ELT.validation.business import BusinessValidation
+from src.ELT.validation.schema import schema_validate
+from src.db.postgres import get_engine
+from airflow.sdk import dag, task
 
 
 @dag(
@@ -24,23 +17,23 @@ from db.postgres import engine
     tags=["ELT", "Pipeline", "Orchestrate"]
 )
 def orchestrate():
-    @task
+    @task(default_args={"retries": 3})
     def extract():
         data = extract_data()
-        raw_schema_reference = stage_data(data, engine)
+        raw_schema_reference = stage_data(data, get_engine())
 
         return raw_schema_reference
     
-    @task()
+    @task(default_args={"retries": 3})
     def transform(raw_schema_reference):
-        data, transformed_schema_reference = transform_data(raw_schema_reference, engine)
+        data, transformed_schema_reference = transform_data(raw_schema_reference, get_engine())
         data = schema_validate(data)
         BusinessValidation(data).run()
         return transformed_schema_reference
 
-    @task
+    @task(default_args={"retries": 3})
     def load(transformed_schema_reference: dict):
-        return load_data(engine, transformed_schema_reference)        
+        return load_data(get_engine(), transformed_schema_reference)        
     
     schema_reference = extract()
     schema_reference = transform(schema_reference)
