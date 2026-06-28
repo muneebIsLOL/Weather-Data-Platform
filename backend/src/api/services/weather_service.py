@@ -1,16 +1,11 @@
-from postgres import engine
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
-
-hourly = pd.read_sql("SELECT * FROM hourly_conditions", engine)
-daily = pd.read_sql("SELECT * FROM daily_conditions", engine)
-now = datetime.now().date()
+from sqlalchemy.engine.base import Engine
 
 
-def get_current():
-    hourly_copy = hourly.copy()
-    hourly_copy["time"] = pd.to_datetime(hourly_copy["time"])
+def get_current(engine: Engine):
+    hourly = pd.read_sql("SELECT * FROM hourly_conditions", engine)
 
     current = pd.read_sql(
         """
@@ -27,14 +22,19 @@ def get_current():
         engine,
     )
 
+    if hourly.empty or current.empty:
+        raise ValueError()
+    
     current["time"] = pd.to_datetime(current["time"]).dt.round("h")
+    hourly["time"] = pd.to_datetime(hourly["time"])
 
-    wind_direction = hourly_copy[hourly_copy["time"].isin(current["time"])][
+    wind_direction = hourly[hourly["time"].isin(current["time"])][
         "wind_direction_cardinal"
     ].iloc[-1]
 
     current = current.sort_values("time")
     current["time"] = current["time"].astype(str)
+
     return {
         "time": current.iloc[-1]["time"],
         "apparent_temp": current.iloc[-1]["apparent_temperature"],
@@ -48,10 +48,18 @@ def get_current():
     }
 
 
-def get_hourly():
-    hourly_copy = hourly.copy()
-    daily_copy = daily.copy()
-    today = daily_copy[pd.to_datetime(daily_copy["time"]).dt.date == now]
+def get_hourly(engine: Engine):
+    now = datetime.now().date()
+    hourly = pd.read_sql("SELECT * FROM hourly_conditions", engine)
+    daily = pd.read_sql("SELECT * FROM daily_conditions", engine)
+
+    today = daily[pd.to_datetime(daily["time"]).dt.date == now]
+
+    hourly = hourly.drop(columns="id")
+    hourly = hourly[pd.to_datetime(hourly["time"]).dt.date == now]
+    if hourly.empty:
+        raise ValueError()
+    hourly["time"] = hourly["time"].dt.strftime("%H:%M")
     sunrise = (
         pd.to_datetime(today["sunrise"])
         .dt.tz_convert("Asia/Karachi")
@@ -64,21 +72,22 @@ def get_hourly():
         .dt.strftime("%H:%M")
         .iloc[0]
     )
-
-    hourly_copy = hourly_copy.drop(columns="id")
-    hourly_copy = hourly_copy[pd.to_datetime(hourly_copy["time"]).dt.date == now]
-    hourly_copy["time"] = hourly_copy["time"].dt.strftime("%H:%M")
-    hourly_copy["is_day"] = np.where(
-        (hourly_copy["time"] >= sunrise) & (hourly_copy["time"] <= sunset), 1, 0
+    hourly["is_day"] = np.where(
+        (hourly["time"] >= sunrise) & (hourly["time"] <= sunset), 1, 0
     )
-    hourly_copy = hourly_copy.sort_values("time")
-    hourly_copy = hourly_copy.to_dict(orient="records")
-    return hourly_copy
+    hourly = hourly.sort_values("time")
+    hourly = hourly.to_dict(orient="records")
+    return hourly
 
 
-def get_today():
-    today_weather = daily[pd.to_datetime(daily["time"]).dt.date == now].copy()
+def get_today(engine: Engine):
+    now = datetime.now().date()
+    daily = pd.read_sql("SELECT * FROM daily_conditions", engine)
+
+    today_weather = daily[pd.to_datetime(daily["time"]).dt.date == now]
     today_weather = today_weather.drop(columns="id")
+    if today_weather.empty:
+        raise ValueError()
 
     for col in ["time", "sunrise", "sunset"]:
         today_weather[col] = pd.to_datetime(today_weather[col])
@@ -90,8 +99,14 @@ def get_today():
     return today_weather.to_dict(orient="records")
 
 
-def get_daily_forecast():
+def get_daily_forecast(engine: Engine):
+    now = datetime.now().date()
+    daily = pd.read_sql("SELECT * FROM daily_conditions", engine)
     forecast = daily[pd.to_datetime(daily["time"]).dt.date >= (now - timedelta(days=1))]
+
+    if forecast.empty:
+        raise ValueError()
+
     forecast = forecast.drop(columns="id")
     forecast["time"] = forecast["time"].dt.day_name()
     forecast.iloc[0, 0] = "Yesterday"
