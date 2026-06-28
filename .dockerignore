@@ -11,7 +11,12 @@ Dockerfile
 *.njsproj
 *.sln
 *.sw?
+*.env.example
 
 # Git related files
 README.md
 .gitignore
+
+# Local config files & folders
+pytest.ini
+**tests/
