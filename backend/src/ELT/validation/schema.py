@@ -1,6 +1,6 @@
 import pandera.pandas as pa
 from pandera.typing.pandas import Series
-from ELT.config.constants import WEATHER_CODES, cardinal_directions
+from src.ELT.config.constants import WEATHER_CODES, cardinal_directions
 import datetime
 
 

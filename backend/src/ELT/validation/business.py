@@ -1,4 +1,4 @@
-from ELT.utilities.errors import ValidationError
+from src.ELT.utilities.errors import ValidationError
 
 class BusinessValidation:
     def __init__(self, data: dict):
