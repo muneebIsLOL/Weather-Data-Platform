@@ -1,15 +1,18 @@
 services:
   elt-db:
     image: postgres:16
+    env_file:
+      - .env.production
     environment:
-      POSTGRES_USER: "Saleem"
-      POSTGRES_PASSWORD: "Cubecraft@123_5313830"
-      POSTGRES_DB: elt_db
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-elt_db}
+      POSTGRES_HOST: ${POSTGRES_HOST:-elt-db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/src/db/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U Saleem -d elt_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       retries: 5
       start_period: 5s
@@ -18,15 +21,12 @@ services:
       - db-shared-net
 
   api:
-    image: weather-api:1.0
+    image: weather-api:1.1
     build:
       context: .
       dockerfile: backend/Dockerfile
-    environment:
-      AUTH_ACCESS_TOKEN: Cubecraft
-      POSTGRES_USER: "Saleem"
-      POSTGRES_PASSWORD: "Cubecraft@123_5313830"
-      POSTGRES_DB: elt_db
+    env_file:
+      - .env.production
     ports:
       - "127.0.0.1:8000:8000"
     healthcheck:
@@ -39,14 +39,14 @@ services:
       - db-shared-net
       - api-internal-net
     volumes:
-      - ./backend/src/db/postgres.py:/app/postgres.py
+      - ./backend/src/db/postgres.py:/app/src/db/postgres.py
     depends_on:
       elt-db:
         condition: service_healthy
     develop:
       watch:
         - path: ./backend/src/api
-          target: /app
+          target: /app/src/api
           action: sync
 
         - path: ./requirements/api.txt
@@ -58,7 +58,7 @@ services:
     image: weather-web:1.0
     build:
       context: .
-      dockerfile: frontend/dockerfile
+      dockerfile: frontend/Dockerfile
     ports:
       - "127.0.0.1:5173:5173"
     healthcheck:
