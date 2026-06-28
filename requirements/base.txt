@@ -3,3 +3,5 @@ numpy
 python-dotenv
 sqlalchemy
 psycopg2-binary
+pytest
+pytest-dotenv
