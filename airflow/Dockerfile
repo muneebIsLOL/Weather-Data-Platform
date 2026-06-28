@@ -1,6 +1,9 @@
 # Use the slim version of Python 3.14.4
 FROM apache/airflow
 
+# Set the environment variable for container seperately
+ENV PYTHONPATH=/opt/airflow/
+
 # Use the app as your workdir of the container
 WORKDIR /opt/airflow/
 
