@@ -67,6 +67,10 @@ def extract_data():
             "metadata": weather_metadata
         }
 
-    except (Exception, HTTPError) as e:
+    except Exception as e:
         print("Error!!")
+        raise e
+    
+    except HTTPError as e:
+        print("Network error!!")
         raise e
