@@ -2,3 +2,4 @@ fastapi<0.111.1
 fastapi-limiter
 uvicorn
 pydantic
+httpx
