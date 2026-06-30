@@ -1,3 +1,3 @@
 pandera
 pendulum
-apache-airflow
+apache-airflow>=3.0.0
