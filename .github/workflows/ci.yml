@@ -29,15 +29,15 @@ jobs:
           -r requirements/airflow.txt \
           -r requirements/api.txt
 
-      - name: Run backend/tests
-        run: pytest
-        working-directory: backend
-
       - name: Start Backend API
         working-directory: backend
         run: |
           python -m uvicorn src.api.main:app --host 127.0.0.1 --port 8000 &
           echo $! > uvicorn.pid
+
+      - name: Run backend/tests
+        run: pytest
+        working-directory: backend
 
       - name: Run airflow/tests
         run: pytest
