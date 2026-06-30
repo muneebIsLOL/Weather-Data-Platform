@@ -1,26 +1,29 @@
-import httpx
+import httpx, os
+from dotenv import load_dotenv
 
+load_dotenv("../.env")
+token = os.environ.get("AUTH_ACCESS_TOKEN")
 
 api = "http://0.0.0.0:8000"
 
 def test_docs_endpoint():
-    response_code = httpx.get(f"{api}/docs").status_code
+    response_code = httpx.get(f"{api}/docs", headers={"token": token}).status_code
     assert response_code == 200
 
 def test_current_weather_endpoint():
-    response_code = httpx.get(f"{api}/current_weather").status_code
+    response_code = httpx.get(f"{api}/current_weather", headers={"token": token}).status_code
     assert response_code == 200
 
 def test_hourly_weather_endpoint():
-    response_code = httpx.get(f"{api}/hourly_weather").status_code
+    response_code = httpx.get(f"{api}/hourly_weather", headers={"token": token}).status_code
     assert response_code == 200
 
 def test_today_weather_endpoint():
-    response_code = httpx.get(f"{api}/daily/today").status_code
+    response_code = httpx.get(f"{api}/daily/today", headers={"token": token}).status_code
     assert response_code == 200
 
 def test_forecast_weather_endpoint():
-    response_code = httpx.get(f"{api}/daily/forecast").status_code
+    response_code = httpx.get(f"{api}/daily/forecast", headers={"token": token}).status_code
     assert response_code == 200
 
 def test_current_conditions_schema():
