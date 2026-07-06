@@ -1,5 +1,4 @@
-# Documentation Title 
-### Backend
+# Backend
 
 # Description
 The backend powers the core functionality of the Weather Data Platform. It is responsible for orchestrating the ELT pipeline, managing data persistence, exposing RESTful API endpoints, and serving processed weather data to the frontend. This documentation covers the backend architecture, data flow, configuration, and development workflow.
