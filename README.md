@@ -18,7 +18,7 @@ A production-style, containerized data engineering platform built with Apache Ai
 ## Core Stack & Tools
 ### Frontend
 - React
-- Vue
+- Vite
 - Vanilla CSS
 
 ### Backend
@@ -69,11 +69,11 @@ A production-style, containerized data engineering platform built with Apache Ai
 
 ### Access the application (Frontend)
 - Open up your browser and type:
-- `localhost:5173` 
+  - `localhost:5173` 
 
 If the application loads successfully, the Weather Data Platform has been deployed correctly and is ready to use.
 
 For component-specific information, refer to:
 
-backend/README.md
-frontend/README.md
+- `backend/README.md`
+- `frontend/README.md`
