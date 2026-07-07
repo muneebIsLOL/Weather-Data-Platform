@@ -7,7 +7,7 @@ Apache Airflow is an open-source platform used to programmatically create, sched
 In this project, Apache-Airflow is used to orchestrate the ELT pipeline from the backend, using both docker and locally.
 
 ## Why Apache-Airflow
-`Apache-Airflow` is one of the most commonly used in production orchestrators. Not only its easier to implement, but its available in the mainstream interpreter `Python` for data pipelines. In `Weather-ELT-Platform`, this is the primary choice as in future versions, other `apache` services would be implemented. This would make this project more synchronized and reliable.
+`Apache-Airflow` is one of the most commonly used in production orchestrators. Not only its easier to implement, but its available in the mainstream interpreter `Python` for data pipelines. In `Weather-Data-Platform`, this is the primary choice as in future versions, other `apache` services would be implemented. This would make this project more synchronized and reliable.
 
 ## Dags
 ### ELT_Orchestration
