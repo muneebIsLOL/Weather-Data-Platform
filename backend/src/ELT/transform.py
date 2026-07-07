@@ -2,6 +2,7 @@ import pandas as pd
 import datetime
 import numpy as np
 from src.ELT.config.constants import WEATHER_CODES, cardinal_directions
+from pathlib import Path
 
 def load_raw(raw_schema_reference: dict, engine):
     data = {}
@@ -155,6 +156,7 @@ def normalize(data: dict):
     return data
 
 def save_data(data: dict):
+    Path("./src/ELT/temp").mkdir(parents=True, exist_ok=True)
     for key, value in data.items():
        value.to_parquet(
            f"./src/ELT/temp/{key}.parquet",
