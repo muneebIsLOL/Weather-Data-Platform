@@ -54,7 +54,7 @@ A production-style, containerized data engineering platform built with Apache Ai
 - Git
 
 ### Clone the Repository
-```git clone github.com/muneebIsLOL/Weather-Data-Platform```
+```git clone https://github.com/muneebIsLOL/Weather-Data-Platform```
 
 ### Configure the Environment Files & Variables
 - After cloning the repo, grab the variables from `.env.example`.
@@ -63,9 +63,9 @@ A production-style, containerized data engineering platform built with Apache Ai
 
 ### Configure the Docker
 - Run the following cmd:
-- `docker compose -f docker-compose.app.yml --env_file .env.production up --build`
+- `docker compose -f docker-compose.app.yml --env-file .env.production up --build`
 - Similarly run the airflow compose:
-- `docker compose -f airflow/docker-compose.airflow.yml --env_file .env.production up --build`
+- `docker compose -f airflow/docker-compose.airflow.yml --env-file .env.production up --build`
 
 ### Access the application (Frontend)
 - Open up your browser and type:
