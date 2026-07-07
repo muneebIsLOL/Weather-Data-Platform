@@ -116,7 +116,7 @@ Schema validation involves verifying the structure, integrity, and basic logic o
 
 **Validation Order**
 
-The Weather-ELT-Platform validation follows subsequent order: 
+The Weather-Data-Platform validation follows subsequent order: 
 
 - `schema`
 - `business`
@@ -125,7 +125,7 @@ The Weather-ELT-Platform validation follows subsequent order:
 The Load & Storage module is the final stage of the ELT pipeline. It securely commits your fully processed and transformed data to the target database. This guarantees data integrity and ensures the pipeline is ready for downstream analytics and reporting.
 
 ## API
-Weather-ELT-Platform API focusses on serving data, primarily for frontend over the internet. It uses `FastAPI` python library and serves data from a database using a `sqlalchemy` engine (connection).
+Weather-Data-Platform API focusses on serving data, primarily for frontend over the internet. It uses `FastAPI` python library and serves data from a database using a `sqlalchemy` engine (connection).
 
 ### Services
 #### Weather Service
