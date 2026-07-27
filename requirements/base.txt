@@ -5,3 +5,5 @@ sqlalchemy
 psycopg2-binary
 pytest
 pytest-dotenv
+boto3
+alembic
