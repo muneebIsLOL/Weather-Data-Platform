@@ -6,5 +6,6 @@ backend/logs/
 *.log
 **/.vscode/
 backend/src/ELT/temp/
+**.local.**
 **.env
 **.env.production
