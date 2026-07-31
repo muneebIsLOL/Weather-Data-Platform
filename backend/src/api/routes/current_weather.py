@@ -1,7 +1,7 @@
 from src.api.services.weather_service import get_current
 from src.api.models.current_conditions import CurrentConditionsResponse
 from fastapi import APIRouter
-from src.db.postgres import get_engine
+from src.db.connection import get_engine
 from pydantic import ValidationError
 
 router = APIRouter()
@@ -14,7 +14,7 @@ router = APIRouter()
 )
 def current_weather():
     try:
-        engine = get_engine()
+        engine = get_engine("/app/src/db/global-bundle.pem")
         response = get_current(engine)
         return response
 

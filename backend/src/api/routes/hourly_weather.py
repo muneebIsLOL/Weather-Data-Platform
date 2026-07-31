@@ -2,7 +2,7 @@ from src.api.services.weather_service import get_hourly
 from src.api.models.hourly_conditions import HourlyConditionsResponse
 from fastapi import APIRouter
 from typing import List
-from src.db.postgres import get_engine
+from src.db.connection import get_engine
 from pydantic import ValidationError
 
 router = APIRouter()
@@ -15,7 +15,7 @@ router = APIRouter()
 )
 def hourly_weather():
     try:
-        engine = get_engine()
+        engine = get_engine("/app/src/db/global-bundle.pem")
         response = get_hourly(engine)
         return response
 
