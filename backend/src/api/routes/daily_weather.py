@@ -3,15 +3,15 @@ from src.api.models.daily_conditions import DailyConditionsResponse
 from typing import List
 from fastapi import APIRouter
 from pydantic import ValidationError
-from src.db.postgres import get_engine
+from src.db.connection import get_engine
 
-router = APIRouter(prefix="/daily", tags=["daily"])
+router = APIRouter(prefix="/daily")
 
 
 @router.get("/today", response_model=List[DailyConditionsResponse], tags=["today"])
 def today_weather():
     try:
-        engine = get_engine()
+        engine = get_engine("/app/src/db/global-bundle.pem")
         response = get_today(engine)
         return response
 
@@ -28,7 +28,7 @@ def today_weather():
 )
 def daily_weather_forecast():
     try:
-        engine = get_engine()
+        engine = get_engine("/app/src/db/global-bundle.pem")
         response = get_daily_forecast(engine)
         return response
 
