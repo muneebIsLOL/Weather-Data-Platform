@@ -9,3 +9,4 @@ backend/src/ELT/temp/
 **.local.**
 **.env
 **.env.production
+**/docker-compose*.yml
