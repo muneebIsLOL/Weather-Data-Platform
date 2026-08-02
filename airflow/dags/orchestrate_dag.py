@@ -5,7 +5,7 @@ from src.ELT.transform import transform_data
 from src.ELT.load import load_data
 from src.ELT.validation.business import BusinessValidation
 from src.ELT.validation.schema import schema_validate
-from src.db.postgres import get_engine
+from src.connection import get_engine
 from airflow.sdk import dag, task
 
 
@@ -20,20 +20,20 @@ def orchestrate():
     @task(default_args={"retries": 3})
     def extract():
         data = extract_data()
-        raw_schema_reference = stage_data(data, get_engine())
+        raw_schema_reference = stage_data(data, get_engine("/opt/airflow/global-bundle.pem"))
 
         return raw_schema_reference
     
     @task(default_args={"retries": 3})
     def transform(raw_schema_reference):
-        data, transformed_schema_reference = transform_data(raw_schema_reference, get_engine())
+        data, transformed_schema_reference = transform_data(raw_schema_reference, get_engine("/opt/airflow/global-bundle.pem"))
         data = schema_validate(data)
         BusinessValidation(data).run()
         return transformed_schema_reference
 
     @task(default_args={"retries": 3})
     def load(transformed_schema_reference: dict):
-        return load_data(get_engine(), transformed_schema_reference)        
+        return load_data(get_engine("/opt/airflow/global-bundle.pem"), transformed_schema_reference)        
     
     schema_reference = extract()
     schema_reference = transform(schema_reference)
