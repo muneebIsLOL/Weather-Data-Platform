@@ -4,12 +4,13 @@ function useFetch(endpoint) {
     const [data, setData] = useState(null)
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
+    const host = import.meta.env.VITE_HOST_URL;
 
     useEffect(() => {
         setLoading(true);
         setError(null);
 
-        fetch(`http://localhost:8000/${endpoint}`, {
+        fetch(`http://${host}:8000/${endpoint}`, {
             headers: { token: "Cubecraft" }
         })
             .then(res => {
