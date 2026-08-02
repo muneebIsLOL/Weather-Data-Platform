@@ -1,5 +1,5 @@
 # Use a lightweight Node.js image for development
-FROM node:24.12.0-alpine AS dev
+FROM node:24.12.0-alpine AS builder
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -15,4 +15,9 @@ WORKDIR ./frontend
 
 RUN npm run build
 
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+FROM nginx:alpine
+
+COPY ./frontend/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/frontend/dist /usr/share/nginx/html
+
+CMD ["nginx", "-g", "daemon off;"]
