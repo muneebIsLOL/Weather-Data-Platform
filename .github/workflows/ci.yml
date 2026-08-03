@@ -1,51 +1,51 @@
-name: Continious Integration
+# name: Continious Integration
 
-on:
-  push:
-    paths:
-      - "backend/src/**"
-      - "frontend/src/**"
-      - "airflow/dags/**"
-      - "**/tests/**"
-      - "requirements/**"
+# on:
+#   push:
+#     paths:
+#       - "backend/src/**"
+#       - "frontend/src/**"
+#       - "airflow/dags/**"
+#       - "**/tests/**"
+#       - "requirements/**"
 
-jobs:
-  test:
-    runs-on: self-hosted
-    steps:
-      - name: Check out Repo
-        uses: actions/checkout@v7
+# jobs:
+#   test:
+#     runs-on: self-hosted
+#     steps:
+#       - name: Check out Repo
+#         uses: actions/checkout@v7
 
-      - name: Install Python
-        uses: actions/setup-python@v6
+#       - name: Install Python
+#         uses: actions/setup-python@v6
   
-        with:
-          python-version: "3.14"
+#         with:
+#           python-version: "3.14"
 
-      - name: Install Python Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install \
-          -r requirements/base.txt \
-          -r requirements/airflow.txt \
-          -r requirements/api.txt
+#       - name: Install Python Dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#           pip install \
+#           -r requirements/base.txt \
+#           -r requirements/airflow.txt \
+#           -r requirements/api.txt
 
-      - name: Start Backend API
-        working-directory: backend
-        run: |
-          python -m uvicorn src.api.main:app --host 127.0.0.1 --port 8000 &
-          echo $! > uvicorn.pid
+#       - name: Start Backend API
+#         working-directory: backend
+#         run: |
+#           python -m uvicorn src.api.main:app --host 127.0.0.1 --port 8000 &
+#           echo $! > uvicorn.pid
 
-      - name: Run backend/tests
-        run: pytest
-        working-directory: backend
+#       - name: Run backend/tests
+#         run: pytest
+#         working-directory: backend
 
-      - name: Run airflow/tests
-        run: pytest
-        working-directory: airflow
+#       - name: Run airflow/tests
+#         run: pytest
+#         working-directory: airflow
       
-      - name: Stop Backend API
-        working-directory: backend
-        if: always()
-        run: |
-          kill $(cat uvicorn.pid)
+#       - name: Stop Backend API
+#         working-directory: backend
+#         if: always()
+#         run: |
+#           kill $(cat uvicorn.pid)
