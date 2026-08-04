@@ -48,26 +48,46 @@ A production-style, containerized data engineering platform built with Apache Ai
 
 ## Step-by-Step Setup
 
-### Prerequisites
-- Docker
-- Docker Compose
-- Git
-
-### Clone the Repository
-```git clone https://github.com/muneebIsLOL/Weather-Data-Platform```
-
 ### Configure the Environment Files & Variables
 - After cloning the repo, grab the variables from `.env.example`.
 - Make an environment file and name it `.env.production`.
 - Paste the variables from `.env.example` and tailor it according to your needs.
 
-### Configure the Docker
+### Option 1:
+
+#### Prerequisites
+- Docker
+- Docker Compose
+- Git
+
+#### Clone the Repository
+```git clone https://github.com/muneebIsLOL/Weather-Data-Platform```
+
+#### Configure the Docker
 - Run the following cmd:
 - `docker compose -f docker-compose.app.yml --env-file .env.production up --build`
 - Similarly run the airflow compose:
 - `docker compose -f airflow/docker-compose.airflow.yml --env-file .env.production up --build`
 
-### Access the application (Frontend)
+#### Access the application (Frontend)
+- Open up your browser and type:
+  - `localhost:5173` 
+
+If the application loads successfully, the Weather Data Platform has been deployed correctly and is ready to use.
+
+### Option 2
+
+#### Releases
+- Head over to releases of the repo
+- Download the full release v1.0.0
+
+#### Deploy using the script
+
+- cd into the downloaded repo directory using `cd /path/`
+- Locate the file named `run.sh`
+- Open a terminal and run the file using `./run.sh`
+
+#### Access the application (Frontend)
 - Open up your browser and type:
   - `localhost:5173` 
 
