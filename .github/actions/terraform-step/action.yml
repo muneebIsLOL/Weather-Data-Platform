@@ -1,0 +1,17 @@
+name: 'Install Terraform'
+description: 'Runs a step to install terraform from hashicorp/setup-terraform registry'
+
+inputs:
+  terraform_version:
+    description: Terraform version to install
+    required: false
+    default: "1.13.3"
+
+runs:
+  using: composite
+
+  steps:
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ inputs.terraform_version }}
