@@ -1,0 +1,119 @@
+name: Terraform CI/CD
+
+on:
+  push:
+    branches:
+      - "aws-migration"
+    paths:
+      - "terraform/environments/dev/**"
+      - "terraform/environments/prod/**"
+  pull_request:
+    branches:
+      - "aws-migration"
+
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  code-quality:
+    runs-on: ubuntu
+    steps:
+      - name: Check Out Repo
+        uses: actions/checkout@v7
+
+      - name: Setup Terraform
+        uses: ./.github/actions/terraform-step
+        with:
+          terraform_version: "1.15.8"
+
+      - name: Validate Dev Code
+        uses: |
+          cd terraform/environments/dev
+          terraform init -backend=false
+          terraform fmt -check
+          terraform validate
+
+      - name: Validate Prod Code
+        uses: |
+          cd terraform/environments/prod
+          terraform init -backend=false
+          terraform fmt -check
+          terraform validate
+
+      - name: Run Trivy vulnerability scanner in IaC mode
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: "config"
+          hide-progress: true
+          format: "sarif"
+          output: "trivy-results.sarif"
+          exit-code: "1"
+          severity: "CRITICAL,HIGH"
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: "trivy-results.sarif"
+
+  deploy-dev:
+    runs-on: ubuntu
+    steps:
+      - name: Check Out Repo
+        uses: actions/checkout@v7
+
+      - name: Setup Terraform
+        uses: ./.github/actions/terraform-step
+        with:
+          terraform_version: "1.15.8"
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          ROLE-TO-ASSUME: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformDevRole
+          AWS-REGION: "ap-south-1"
+
+      - name: Change Directory to Terraform Dev Dir
+        uses: cd terraform/environments/dev
+
+      - name: Terraform Init
+        uses: terraform init
+
+      - name: Terraform Plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/aws-migration' && github.event_name == 'push'
+        run: terraform apply -input=false -auto-approve
+
+  deploy-prod:
+    runs-on: ubuntu
+    steps:
+      - name: Check Out Repo
+        uses: actions/checkout@v7
+
+      - name: Setup Terraform
+        uses: ./.github/actions/terraform-step
+        with:
+          terraform_version: "1.15.8"
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          ROLE-TO-ASSUME: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformProdRole
+          AWS-REGION: "ap-south-1"
+
+      - name: Change Directory to Terraform Prod Dir
+        uses: cd terraform/environments/prod
+
+      - name: Terraform Init
+        uses: terraform init
+
+      - name: Terraform Plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/aws-migration' && github.event_name == 'push'
+        run: terraform apply -input=false -auto-approve
