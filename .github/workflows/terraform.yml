@@ -14,9 +14,11 @@ on:
 permissions:
   id-token: write
   contents: read
+  security-events: write 
+
 jobs:
   code-quality:
-    runs-on: ubuntu
+    runs-on: ubuntu-latest
     steps:
       - name: Check Out Repo
         uses: actions/checkout@v7
@@ -27,15 +29,15 @@ jobs:
           terraform_version: "1.15.8"
 
       - name: Validate Dev Code
-        uses: |
-          cd terraform/environments/dev
+        working-directory: terraform/environments/dev
+        run: |
           terraform init -backend=false
           terraform fmt -check
           terraform validate
 
       - name: Validate Prod Code
-        uses: |
-          cd terraform/environments/prod
+        working-directory: terraform/environments/prod
+        run: |
           terraform init -backend=false
           terraform fmt -check
           terraform validate
@@ -63,7 +65,8 @@ jobs:
           path: logs/
 
   deploy-dev:
-    runs-on: ubuntu
+    needs: code-quality
+    runs-on: ubuntu-latest
     steps:
       - name: Check Out Repo
         uses: actions/checkout@v7
@@ -76,66 +79,79 @@ jobs:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          ROLE-TO-ASSUME: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformDevRole
-          AWS-REGION: "ap-south-1"
-
-      - name: Change Directory to Terraform Dev Dir
-        uses: cd terraform/environments/dev
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformDevRole
+          aws-region: "ap-south-1"
 
       - name: Terraform Init
-        uses: terraform init
+        working-directory: terraform/environments/dev
+        run: terraform init
 
       - name: Terraform Plan
+        working-directory: terraform/environments/dev
         if: github.event_name == 'pull_request'
         run: terraform plan -input=false -out=tfplan
 
       - name: Terraform Apply
+        working-directory: terraform/environments/dev
         if: github.ref == 'refs/heads/aws-migration' && github.event_name == 'push'
         run: terraform apply -input=false -auto-approve
-      - name: Upload Test Logs
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-logs
-          path: logs/
-
-  deploy-prod:
-    runs-on: ubuntu
-    steps:
-      - name: Check Out Repo
-        uses: actions/checkout@v7
-
-      - name: Setup Terraform
-        uses: ./.github/actions/terraform-step
-        with:
-          terraform_version: "1.15.8"
-
-      - name: Configure AWS Credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v6
-        with:
-          ROLE-TO-ASSUME: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformProdRole
-          AWS-REGION: "ap-south-1"
-
-      - name: Change Directory to Terraform Prod Dir
-        uses: cd terraform/environments/prod
-
-      - name: Terraform Init
-        uses: terraform init
-
-      - name: Terraform Plan
-        if: github.event_name == 'pull_request'
-        run: terraform plan -input=false -out=tfplan
-
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/aws-migration' && github.event_name == 'push'
-        run: terraform apply -input=false -auto-approve
-
+        
       - name: Make Logs Folder
-        run: mkdir -p logs  
+        working-directory: terraform/environments/dev
+        if: failure()
+        run: |
+          mkdir -p logs
+          terraform show > logs/plan_error.txt
 
       - name: Upload Test Logs
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: pipeline-logs
-          path: logs/
+          name: terraform-dev-logs
+          path: terraform/environments/dev/logs/
+
+  deploy-prod:
+    needs: code-quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Out Repo
+        uses: actions/checkout@v7
+
+      - name: Setup Terraform
+        uses: ./.github/actions/terraform-step
+        with:
+          terraform_version: "1.15.8"
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformProdRole
+          aws-region: "ap-south-1"
+
+      - name: Terraform Init
+        working-directory: terraform/environments/prod
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: terraform/environments/prod
+        if: github.event_name == 'pull_request'
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Terraform Apply
+        working-directory: terraform/environments/prod
+        if: github.ref == 'refs/heads/aws-migration' && github.event_name == 'push'
+        run: terraform apply -input=false -auto-approve
+
+      - name: Make Logs Folder
+        working-directory: terraform/environments/prod
+        if: failure()
+        run: |
+          mkdir -p logs
+          terraform show > logs/plan_error.txt
+
+      - name: Upload Test Logs
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: terraform-prod-logs
+          path: terraform/environments/prod/logs/
