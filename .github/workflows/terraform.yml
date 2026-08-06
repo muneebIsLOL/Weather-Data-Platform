@@ -15,6 +15,7 @@ permissions:
   id-token: write
   contents: read
   security-events: write 
+  pull-requests: write
 
 jobs:
   code-quality:
@@ -57,12 +58,6 @@ jobs:
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: "trivy-results.sarif"
-      - name: Upload Test Logs
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-logs
-          path: logs/
 
   deploy-dev:
     needs: code-quality
@@ -84,7 +79,12 @@ jobs:
 
       - name: Terraform Init
         working-directory: terraform/environments/dev
-        run: terraform init
+        run: |
+          terraform init -reconfigure \
+            -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET }}" \
+            -backend-config="key=terraform/${{ github.ref_name }}/terraform.tfstate" \
+            -backend-config="use_lockfile=true" \
+            -backend-config="region=ap-south-1"
 
       - name: Terraform Plan
         working-directory: terraform/environments/dev
@@ -111,8 +111,9 @@ jobs:
           path: terraform/environments/dev/logs/
 
   deploy-prod:
-    needs: code-quality
+    needs: deploy-dev
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: Check Out Repo
         uses: actions/checkout@v7
@@ -130,7 +131,12 @@ jobs:
 
       - name: Terraform Init
         working-directory: terraform/environments/prod
-        run: terraform init
+        run: |
+          terraform init -reconfigure \
+            -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET }}" \
+            -backend-config="key=terraform/${{ github.ref_name }}/terraform.tfstate" \
+            -backend-config="use_lockfile=true" \
+            -backend-config="region=ap-south-1"
 
       - name: Terraform Plan
         working-directory: terraform/environments/prod
