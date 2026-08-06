@@ -1,0 +1,27 @@
+module "vpc" {
+  source       = "./modules/networking"
+  project_name = var.project_name
+  environment  = var.environment
+  cidr_block   = "10.0.0.0/16"
+  private_subnets = {
+    "subnet-1" = {
+      cidr_block = "10.0.1.0/24"
+      az         = "ap-south-1a"
+    }
+    "subnet-2" = {
+      cidr_block = "10.0.2.0/24"
+      az         = "ap-south-1b"
+    }
+  }
+
+  public_subnets = {
+    "subnet-1" = {
+      cidr_block = "10.0.3.0/24"
+      az         = "ap-south-1a"
+    }
+    "subnet-2" = {
+      cidr_block = "10.0.4.0/24"
+      az         = "ap-south-1b"
+    }
+  }
+}
