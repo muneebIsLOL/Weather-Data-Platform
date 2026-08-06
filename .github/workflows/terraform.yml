@@ -25,9 +25,10 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Setup Terraform
-        uses: ./.github/actions/terraform-step
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.15.8"
+          terraform_wrapper: false
 
       - name: Validate Dev Code
         working-directory: terraform/environments/dev
@@ -67,9 +68,10 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Setup Terraform
-        uses: ./.github/actions/terraform-step
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.15.8"
+          terraform_wrapper: false
 
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v6
@@ -119,9 +121,10 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Setup Terraform
-        uses: ./.github/actions/terraform-step
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.15.8"
+          terraform_wrapper: false
 
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v6
