@@ -79,6 +79,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformDevRole
           aws-region: "ap-south-1"
+          audience: sts.amazon.com
 
       - name: Terraform Init
         working-directory: terraform/environments/dev
@@ -132,6 +133,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformProdRole
           aws-region: "ap-south-1"
+          audience: sts.amazon.com
 
       - name: Terraform Init
         working-directory: terraform/environments/prod
