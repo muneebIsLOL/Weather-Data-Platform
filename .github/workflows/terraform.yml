@@ -74,6 +74,11 @@ jobs:
         with:
           terraform_version: "1.15.8"
           terraform_wrapper: false
+          
+      - name: Debug OIDC Claims
+        uses: github/actions-oidc-debugger@v1
+        with:
+          audience: sts.amazon.com
 
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v6
@@ -128,6 +133,11 @@ jobs:
         with:
           terraform_version: "1.15.8"
           terraform_wrapper: false
+
+      - name: Debug OIDC Claims
+        uses: github/actions-oidc-debugger@v1
+        with:
+          audience: sts.amazon.com
 
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v6
