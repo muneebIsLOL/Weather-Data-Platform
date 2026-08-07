@@ -1,3 +1,11 @@
+module "iam" {
+  source = "./iam"
+}
+
+module "cloudwatch" {
+  source = "./modules/cloudwatch"
+}
+
 module "vpc" {
   source       = "./modules/networking"
   project_name = var.project_name
@@ -24,4 +32,9 @@ module "vpc" {
       az         = "ap-south-1b"
     }
   }
+
+  external_cloudwatch_log_group_arn = module.iam.flow_log_role_arn
+  external_flow_log_role_arn = module.cloudwatch.log_group_arn
+  external_logs_permission_policy_id = module.iam.logs_permission_policy_id
+
 }
