@@ -43,3 +43,18 @@ variable "public_subnets" {
     }
   }
 }
+
+variable "external_flow_log_role_arn" {
+  type        = string
+  description = "IAM Role ARN coming from the iam module directory"
+}
+
+variable "external_cloudwatch_log_group_arn" {
+  type        = string
+  description = "CloudWatch log group ARN coming from the cloudwatch module directory"
+}
+
+variable "external_logs_permission_policy_id" {
+  type = string
+  description = "ID for logs permission policy in cloudwatch for flow logs"
+}
