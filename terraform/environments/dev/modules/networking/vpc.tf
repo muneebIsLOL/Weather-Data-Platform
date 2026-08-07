@@ -24,7 +24,6 @@ resource "aws_subnet" "private" {
 resource "aws_subnet" "public" {
   for_each                = var.public_subnets
   vpc_id                  = aws_vpc.this.id
-  map_public_ip_on_launch = true
 
   cidr_block        = each.value.cidr_block
   availability_zone = each.value.az
