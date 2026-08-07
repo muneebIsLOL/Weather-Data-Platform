@@ -22,8 +22,8 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_subnet" "public" {
-  for_each = var.public_subnets
-  vpc_id   = aws_vpc.this.id
+  for_each                = var.public_subnets
+  vpc_id                  = aws_vpc.this.id
   map_public_ip_on_launch = true
 
   cidr_block        = each.value.cidr_block
@@ -39,5 +39,5 @@ resource "aws_flow_log" "this" {
   log_destination = var.external_flow_log_role_arn
   traffic_type    = "ALL"
   vpc_id          = aws_vpc.this.id
-  depends_on = [var.external_logs_permission_policy_id]
+  depends_on      = [var.external_logs_permission_policy_id]
 }

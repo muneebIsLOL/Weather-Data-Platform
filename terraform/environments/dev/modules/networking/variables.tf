@@ -55,6 +55,6 @@ variable "external_cloudwatch_log_group_arn" {
 }
 
 variable "external_logs_permission_policy_id" {
-  type = string
+  type        = string
   description = "ID for logs permission policy in cloudwatch for flow logs"
 }
