@@ -47,17 +47,25 @@ resource "aws_iam_role_policy" "cloudwatch_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "AllowBasicLogsPermissions"
+        Sid    = "AllowLogGroupManagement"
         Effect = "Allow"
         Action = [
           "logs:CreateLogGroup",
-          "logs:TagLogGroup",
           "logs:DeleteLogGroup",
-          "logs:UntagLogGroup",
           "logs:PutRetentionPolicy",
+          "logs:TagLogGroup",
+          "logs:UntagLogGroup",
           "logs:TagResource",
-          "logs:UntagResource",
-          "logs:Describe*"
+          "logs:UntagResource"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowLogDescribeActions"
+        Effect = "Allow"
+        Action = [
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams"
         ]
         Resource = "*"
       }
