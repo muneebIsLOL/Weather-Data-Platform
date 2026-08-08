@@ -106,7 +106,7 @@ jobs:
       - name: Terraform Apply
         working-directory: terraform/environments/dev
         if: github.ref == 'refs/heads/aws-migration' && github.event_name == 'push'
-        run: terraform apply -input=false -auto-approve -refresh=false
+        run: terraform apply -input=false -auto-approve
         
       - name: Make Logs Folder
         working-directory: terraform/environments/dev
