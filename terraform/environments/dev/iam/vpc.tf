@@ -20,11 +20,12 @@ resource "aws_iam_role_policy" "this" {
       },
 
       {
-        Sid    = "AllowSubnetCreation"
+        Sid    = "AllowSubnetManagement"
         Effect = "Allow"
 
         Action = [
-          "ec2:CreateSubnet*"
+          "ec2:CreateSubnet*",
+          "ec2:DeleteSubnet"
         ]
 
         Resource = "*"
@@ -36,7 +37,9 @@ resource "aws_iam_role_policy" "this" {
 
         Action = [
           "ec2:CreateInternetGateway",
-          "ec2:AttachInternetGateway"
+          "ec2:AttachInternetGateway",
+          "ec2:DeleteInternetGateway",
+          "ec2:DetachInternetGateway"
         ]
 
         Resource = "*"
@@ -48,7 +51,9 @@ resource "aws_iam_role_policy" "this" {
 
         Action = [
           "ec2:CreateNatGateway",
-          "ec2:AssociateNatGatewayAddress"
+          "ec2:DeleteNatGateway",
+          "ec2:AssociateNatGatewayAddress",
+          "ec2:DisassociateNatGatewayAddress"
         ]
 
         Resource = "*"
@@ -60,20 +65,23 @@ resource "aws_iam_role_policy" "this" {
 
         Action = [
           "ec2:CreateRouteTable",
+          "ec2:DeleteRouteTable",
           "ec2:CreateRoute",
           "ec2:ReplaceRoute",
-          "ec2:AssociateRouteTable"
+          "ec2:AssociateRouteTable",
+          "ec2:DisassociateRouteTable"
         ]
 
         Resource = "*"
       },
 
       {
-        Sid    = "AllowResourceTagging"
+        Sid    = "AllowResourceTagsManagement"
         Effect = "Allow"
 
         Action = [
-          "ec2:CreateTags"
+          "ec2:CreateTags",
+          "ec2:DeleteTags"
         ]
 
         Resource = "*"
