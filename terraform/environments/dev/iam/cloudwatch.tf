@@ -38,3 +38,24 @@ resource "aws_iam_role_policy" "logs_permissions" {
     ]
   })
 }
+
+resource "aws_iam_role_policy" "cloudwatch_policy" {
+  name = "cloudwatch-permissions"
+  role = var.current_role_arn
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid = "AllowBasicLogsPermissions"
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:TagLogGroup",
+          "logs:DeleteLogGroup",
+          "logs:UntagLogGroup"
+        ]
+      }
+    ]
+  })
+}
