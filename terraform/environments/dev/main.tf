@@ -11,16 +11,15 @@ module "iam" {
 }
 
 module "cloudwatch" {
-  source                      = "./modules/cloudwatch"
-  terraform_cloudwatch_policy = module.iam.terraform_cloudwatch_policy_id
+  source     = "./modules/cloudwatch"
+  depends_on = [module.iam]
 }
 
 module "vpc" {
-  source                                = "./modules/networking"
-  project_name                          = var.project_name
-  environment                           = var.environment
-  cidr_block                            = "10.0.0.0/16"
-  external_vpc_iam_permission_policy_id = module.iam.vpc_iam_permission_policy_id
+  source       = "./modules/networking"
+  project_name = var.project_name
+  environment  = var.environment
+  cidr_block   = "10.0.0.0/16"
 
   private_subnets = {
     "subnet-1" = {
@@ -44,8 +43,7 @@ module "vpc" {
     }
   }
 
-  external_cloudwatch_log_group_arn  = module.iam.flow_log_role_arn
-  external_flow_log_role_arn         = module.cloudwatch.log_group_arn
-  external_logs_permission_policy_id = module.iam.vpc_logs_permission_policy_id
-
+  external_cloudwatch_log_group_arn = module.iam.flow_log_role_arn
+  external_flow_log_role_arn        = module.cloudwatch.log_group_arn
+  depends_on                        = [module.cloudwatch]
 }
