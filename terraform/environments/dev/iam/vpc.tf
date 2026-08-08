@@ -1,6 +1,6 @@
 resource "aws_iam_role_policy" "this" {
   name = "vpc-permissions"
-  role = data.aws_iam_session_context.current.issuer_name
+  role = var.current_role_arn
 
   policy = jsonencode({
     Version = "2012-10-17"
