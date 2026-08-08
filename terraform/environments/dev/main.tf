@@ -1,5 +1,13 @@
+data "aws_caller_identity" "current" {}
+
+data "aws_iam_session_context" "current" {
+  arn = data.aws_caller_identity.current.arn
+}
+
 module "iam" {
   source = "./iam"
+  current_role_arn = data.aws_iam_session_context.current.issuer_name
+  account_id = data.aws_caller_identity.current.id
 }
 
 module "cloudwatch" {
