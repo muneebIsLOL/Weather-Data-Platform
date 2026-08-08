@@ -58,3 +58,8 @@ variable "external_logs_permission_policy_id" {
   type        = string
   description = "ID for logs permission policy in cloudwatch for flow logs"
 }
+
+variable "external_vpc_iam_permission_policy_id" {
+  type = string
+  description = "ID for vpc permission policy"
+}
