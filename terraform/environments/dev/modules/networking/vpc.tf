@@ -8,7 +8,6 @@ resource "aws_vpc" "this" {
     Name = "${var.project_name}-${var.environment}-vpc"
   }
 
-  depends_on = [var.external_vpc_iam_permission_policy_id]
 }
 
 resource "aws_subnet" "private" {
@@ -40,5 +39,4 @@ resource "aws_flow_log" "this" {
   log_destination = var.external_flow_log_role_arn
   traffic_type    = "ALL"
   vpc_id          = aws_vpc.this.id
-  depends_on      = [var.external_logs_permission_policy_id]
 }
