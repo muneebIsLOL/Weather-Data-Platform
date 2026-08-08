@@ -7,6 +7,8 @@ resource "aws_vpc" "this" {
   tags = {
     Name = "${var.project_name}-${var.environment}-vpc"
   }
+
+  depends_on = [var.external_vpc_iam_permission_policy_id]
 }
 
 resource "aws_subnet" "private" {
