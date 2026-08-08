@@ -7,11 +7,13 @@ resource "aws_iam_role_policy" "this" {
 
     Statement = [
       {
-        Sid    = "AllowVpcCreation"
+        Sid    = "AllowVpcPermissions"
         Effect = "Allow"
 
         Action = [
-          "ec2:CreateVpc"
+          "ec2:CreateVpc",
+          "ec2:ModifyVpc*",
+          "ec2:DeleteVpc*"
         ]
 
         Resource = "*"
@@ -83,16 +85,6 @@ resource "aws_iam_role_policy" "this" {
 
         Action = [
           "ec2:Describe*"
-        ]
-
-        Resource = "*"
-      },
-      {
-        Sid    = "AllowVPCModification"
-        Effect = "Allow"
-
-        Action = [
-          "ec2:ModifyVpc*"
         ]
 
         Resource = "*"
