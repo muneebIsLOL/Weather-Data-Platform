@@ -98,14 +98,24 @@ resource "aws_iam_role_policy" "this" {
         Resource = "*"
       },
       {
-        "Effect" : "Allow",
-        "Action" : [
+        Effect = "Allow",
+        Sid    = "AllowEIPManagement"
+        Action = [
           "ec2:AllocateAddress",
           "ec2:AssociateAddress",
           "ec2:DisassociateAddress",
           "ec2:ReleaseAddress"
         ],
-        "Resource" : "*"
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Sid    = "AllowFlowLogsManagement"
+        Action = [
+          "ec2:CreateFlowLogs",
+          "ec2:DeleteFlowLogs"
+        ]
+        Resource = "*"
       }
     ]
   })
