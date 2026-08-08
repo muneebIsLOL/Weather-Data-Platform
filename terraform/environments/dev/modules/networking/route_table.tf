@@ -1,3 +1,11 @@
+resource "aws_eip" "this" {
+  domain = "vpc"
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-eip"
+  }
+}
+
 resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
 
@@ -7,9 +15,11 @@ resource "aws_internet_gateway" "this" {
 }
 
 resource "aws_nat_gateway" "this" {
-  subnet_id = aws_subnet.public["subnet-1"].id
+  allocation_id = aws_eip.this.id
+  subnet_id     = aws_subnet.public["subnet-1"].id
 
-  availability_mode = "regional"
+  availability_mode = "zonal"
+
   tags = {
     Name = "${var.project_name}-${var.environment}-nat-igw"
   }
