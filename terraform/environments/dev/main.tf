@@ -12,6 +12,7 @@ module "iam" {
 
 module "cloudwatch" {
   source = "./modules/cloudwatch"
+  logs_policy_id = module.iam.logs_permission_policy_id
 }
 
 module "vpc" {
