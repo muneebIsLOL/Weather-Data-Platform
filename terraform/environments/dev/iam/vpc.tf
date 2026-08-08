@@ -1,5 +1,5 @@
 resource "aws_iam_role_policy" "this" {
-  name = "vpc-permissions"
+  name = "terraform-vpc-permissions"
   role = var.current_role_arn
 
   policy = jsonencode({
