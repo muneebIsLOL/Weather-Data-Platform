@@ -56,7 +56,9 @@ resource "aws_iam_role_policy" "terraform_cloudwatch_policy" {
           "logs:TagLogGroup",
           "logs:UntagLogGroup",
           "logs:TagResource",
-          "logs:UntagResource"
+          "logs:UntagResource",
+          "logs:ListTagsForResource",
+          "logs:ListTagsLogGroup"
         ]
         Resource = "*"
       },
