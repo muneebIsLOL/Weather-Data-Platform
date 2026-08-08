@@ -53,7 +53,10 @@ resource "aws_iam_role_policy" "cloudwatch_policy" {
           "logs:CreateLogGroup",
           "logs:TagLogGroup",
           "logs:DeleteLogGroup",
-          "logs:UntagLogGroup"
+          "logs:UntagLogGroup",
+          "logs:PutRetentionPolicy",
+          "logs:TagResource",
+          "logs:UntagResource"
         ]
         Resource = "*"
       }
