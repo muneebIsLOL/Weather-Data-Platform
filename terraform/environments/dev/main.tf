@@ -20,6 +20,8 @@ module "vpc" {
   project_name = var.project_name
   environment  = var.environment
   cidr_block   = "10.0.0.0/16"
+  external_vpc_iam_permission_policy_id = module.iam.vpc_iam_permission_policy_id
+
   private_subnets = {
     "subnet-1" = {
       cidr_block = "10.0.1.0/24"
