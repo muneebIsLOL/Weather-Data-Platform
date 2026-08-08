@@ -7,9 +7,9 @@ resource "aws_internet_gateway" "this" {
 }
 
 resource "aws_nat_gateway" "this" {
-  subnet_id         = aws_subnet.public["subnet-1"].id
-  vpc_id = aws_vpc.this.id
-  
+  subnet_id = aws_subnet.public["subnet-1"].id
+  vpc_id    = aws_vpc.this.id
+
   availability_mode = "regional"
   tags = {
     Name = "${var.project_name}-${var.environment}-nat-igw"
