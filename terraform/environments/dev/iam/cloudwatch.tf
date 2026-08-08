@@ -47,7 +47,7 @@ resource "aws_iam_role_policy" "cloudwatch_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid = "AllowBasicLogsPermissions"
+        Sid    = "AllowBasicLogsPermissions"
         Effect = "Allow"
         Action = [
           "logs:CreateLogGroup",
