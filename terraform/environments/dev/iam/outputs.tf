@@ -5,7 +5,7 @@ output "flow_log_role_arn" {
 
 output "logs_permission_policy_id" {
   description = "Inline policy for flow log role for vpc in cloudwatch."
-  value       = aws_iam_role_policy.logs_permissions.id
+  value       = aws_iam_role_policy.cloudwatch_policy.id
 }
 
 output "vpc_iam_permission_policy_id" {
