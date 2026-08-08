@@ -10,5 +10,5 @@ output "logs_permission_policy_id" {
 
 output "vpc_iam_permission_policy_id" {
   description = "Vpc permission policy id."
-  value       = aws_iam_role_policy.this.id
+  value       = aws_iam_role_policy.cloudwatch_policy.id
 }
