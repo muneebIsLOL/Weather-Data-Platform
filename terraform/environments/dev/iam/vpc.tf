@@ -86,6 +86,16 @@ resource "aws_iam_role_policy" "this" {
         ]
 
         Resource = "*"
+      },
+      {
+        Sid    = "AllowVPCModification"
+        Effect = "Allow"
+
+        Action = [
+          "ec2:ModifyVpc*"
+        ]
+
+        Resource = "*"
       }
     ]
   })
