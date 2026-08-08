@@ -11,8 +11,8 @@ module "iam" {
 }
 
 module "cloudwatch" {
-  source         = "./modules/cloudwatch"
-  logs_policy_id = module.iam.logs_permission_policy_id
+  source                      = "./modules/cloudwatch"
+  terraform_cloudwatch_policy = module.iam.terraform_cloudwatch_policy_id
 }
 
 module "vpc" {
@@ -46,6 +46,6 @@ module "vpc" {
 
   external_cloudwatch_log_group_arn  = module.iam.flow_log_role_arn
   external_flow_log_role_arn         = module.cloudwatch.log_group_arn
-  external_logs_permission_policy_id = module.iam.logs_permission_policy_id
+  external_logs_permission_policy_id = module.iam.vpc_logs_permission_policy_id
 
 }
