@@ -16,10 +16,10 @@ module "cloudwatch" {
 }
 
 module "vpc" {
-  source       = "./modules/networking"
-  project_name = var.project_name
-  environment  = var.environment
-  cidr_block   = "10.0.0.0/16"
+  source                                = "./modules/networking"
+  project_name                          = var.project_name
+  environment                           = var.environment
+  cidr_block                            = "10.0.0.0/16"
   external_vpc_iam_permission_policy_id = module.iam.vpc_iam_permission_policy_id
 
   private_subnets = {

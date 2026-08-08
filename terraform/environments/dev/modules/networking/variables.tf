@@ -60,6 +60,6 @@ variable "external_logs_permission_policy_id" {
 }
 
 variable "external_vpc_iam_permission_policy_id" {
-  type = string
+  type        = string
   description = "ID for vpc permission policy"
 }
