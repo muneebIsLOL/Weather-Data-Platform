@@ -1,9 +1,9 @@
 variable "account_id" {
-  type = string
+  type        = string
   description = "The 12 digit unique AWS account id."
 }
 
 variable "current_role_arn" {
-  type = string
+  type        = string
   description = "The ARN attribute of the current OIDC role."
 }
