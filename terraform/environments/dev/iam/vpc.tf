@@ -96,6 +96,16 @@ resource "aws_iam_role_policy" "this" {
         ]
 
         Resource = "*"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:AllocateAddress",
+          "ec2:AssociateAddress",
+          "ec2:DisassociateAddress",
+          "ec2:ReleaseAddress"
+        ],
+        "Resource" : "*"
       }
     ]
   })
