@@ -17,7 +17,7 @@ resource "aws_iam_role" "flow_log_role" {
   })
 }
 
-resource "aws_iam_role_policy" "logs_permissions" {
+resource "aws_iam_role_policy" "vpc_logs_permissions" {
   name = "logs-permissions"
   role = aws_iam_role.flow_log_role.id
 
@@ -39,8 +39,8 @@ resource "aws_iam_role_policy" "logs_permissions" {
   })
 }
 
-resource "aws_iam_role_policy" "cloudwatch_policy" {
-  name = "cloudwatch-permissions"
+resource "aws_iam_role_policy" "terraform_cloudwatch_policy" {
+  name = "terraform-cloudwatch-permissions"
   role = var.current_role_arn
 
   policy = jsonencode({
