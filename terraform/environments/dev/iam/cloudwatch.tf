@@ -55,6 +55,7 @@ resource "aws_iam_role_policy" "cloudwatch_policy" {
           "logs:DeleteLogGroup",
           "logs:UntagLogGroup"
         ]
+        Resource = "*"
       }
     ]
   })
