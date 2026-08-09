@@ -1,5 +1,6 @@
 resource "aws_iam_role" "flow_log_role" {
   name = "vpc-flow-log-cloudwatch-role"
+  path = "/service-roles/"
 
   permissions_boundary = "arn:aws:iam::${var.account_id}:policy/TerraformDevPermissionsBoundary"
   assume_role_policy = jsonencode({
