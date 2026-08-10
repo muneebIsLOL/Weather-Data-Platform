@@ -1,4 +1,4 @@
-resource "aws_iam_role_policy" "this" {
+resource "aws_iam_role_policy" "vpc" {
   name = "terraform-vpc-permissions"
   role = var.current_role_arn
 
@@ -114,6 +114,22 @@ resource "aws_iam_role_policy" "this" {
         Action = [
           "ec2:CreateFlowLogs",
           "ec2:DeleteFlowLogs"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Sid    = "AllowSecurityGroupManagement"
+        Action = [
+          "ec2:CreateSecurityGroup",
+          "ec2:DeleteSecurityGroup",
+          "ec2:ModifySecurityGroupRules",
+          "ec2:RevokeSecurityGroupEgress",
+          "ec2:RevokeSecurityGroupIngress",
+          "ec2:AssociateSecurityGroupVpc",
+          "ec2:DisassociateSecurityGroupVpc",
+          "ec2:AuthorizeSecurityGroupEgress",
+          "ec2:AuthorizeSecurityGroupIngress"
         ]
         Resource = "*"
       }
