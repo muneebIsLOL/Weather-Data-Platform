@@ -9,7 +9,7 @@ resource "aws_db_instance" "weather" {
   engine_version         = "18.4"
   allocated_storage      = 20
   storage_type           = "gp3"
-  db_name                = "${var.project_name}_${var.environment}_weather_db"
+  db_name                = "weather_db"
   username               = "postgres"
   password               = "MySecurePassword123!"
   instance_class         = "db.t3.micro"
@@ -27,7 +27,7 @@ resource "aws_db_instance" "airflow" {
   engine_version         = "18.4"
   allocated_storage      = 20
   storage_type           = "gp3"
-  db_name                = "${var.project_name}_${var.environment}_airflow_db"
+  db_name                = "airflow_db"
   username               = "postgres"
   password               = "MySecurePassword123!"
   instance_class         = "db.t3.micro"
