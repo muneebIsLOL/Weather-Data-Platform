@@ -47,3 +47,12 @@ module "vpc" {
   external_flow_log_role_arn        = module.cloudwatch.log_group_arn
   depends_on                        = [module.cloudwatch]
 }
+
+module "db" {
+  source       = "./modules/databases"
+  project_name = var.project_name
+  environment  = var.environment
+  subnet_ids   = module.vpc.subnet_ids
+  sg_ids       = [module.vpc.postgres_sg_id]
+  depends_on   = [module.vpc]
+}
