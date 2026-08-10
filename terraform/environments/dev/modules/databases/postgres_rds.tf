@@ -17,6 +17,7 @@ resource "aws_db_instance" "weather" {
   publicly_accessible    = false
   skip_final_snapshot    = true
   deletion_protection    = false
+  storage_encrypted      = true
   vpc_security_group_ids = var.sg_ids
 }
 
@@ -34,5 +35,6 @@ resource "aws_db_instance" "airflow" {
   publicly_accessible    = false
   skip_final_snapshot    = true
   deletion_protection    = false
+  storage_encrypted      = true
   vpc_security_group_ids = var.sg_ids
 }
