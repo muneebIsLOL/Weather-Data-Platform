@@ -56,3 +56,11 @@ module "db" {
   sg_ids       = [module.vpc.postgres_sg_id]
   depends_on   = [module.vpc]
 }
+
+module "ecr" {
+  source       = "./modules/ecr"
+  project_name = var.project_name
+  environment  = var.environment
+
+  depends_on = [module.iam]
+}
