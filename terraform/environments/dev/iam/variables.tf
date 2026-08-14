@@ -7,3 +7,11 @@ variable "current_role_arn" {
   type        = string
   description = "The ARN attribute of the current OIDC role."
 }
+
+variable "project_name" {
+  type = string
+}
+
+variable "environment" {
+  type = string
+}
