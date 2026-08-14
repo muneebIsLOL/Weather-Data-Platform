@@ -4,7 +4,7 @@ data "aws_ecr_image" "backend" {
 }
 
 output "backend_image" {
-  value = "${data.aws_ecr_image.backend.repository_url}@${data.aws_ecr_image.backend.image_digest}"
+  value = "${data.aws_ecr_image.backend.image_uri}@${data.aws_ecr_image.backend.image_digest}"
 }
 
 data "aws_ecr_image" "frontend" {
@@ -13,7 +13,7 @@ data "aws_ecr_image" "frontend" {
 }
 
 output "frontend_image" {
-  value = "${data.aws_ecr_image.frontend.repository_url}@${data.aws_ecr_image.frontend.image_digest}"
+  value = "${data.aws_ecr_image.frontend.image_uri}@${data.aws_ecr_image.frontend.image_digest}"
 }
 
 data "aws_ecr_image" "orchestrator" {
@@ -22,5 +22,5 @@ data "aws_ecr_image" "orchestrator" {
 }
 
 output "orchestrator_image" {
-  value = "${data.aws_ecr_image.orchestrator.repository_url}@${data.aws_ecr_image.orchestrator.image_digest}"
+  value = "${data.aws_ecr_image.orchestrator.image_uri}@${data.aws_ecr_image.orchestrator.image_digest}"
 }
