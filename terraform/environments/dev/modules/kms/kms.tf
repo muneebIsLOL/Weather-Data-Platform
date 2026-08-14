@@ -44,10 +44,7 @@ resource "aws_kms_key" "app" {
         Sid    = "Allow use of the key"
         Effect = "Allow"
         Principal = {
-          AWS = [
-            "arn:aws:iam::${var.current_account_id}:role/TerraformDevRole",
-            "arn:aws:iam::${var.current_account_id}:role/service-roles/weather-platform-dev-ecs-task-role" # 👈 MUST be the exact, full role ARN
-          ]
+          AWS = "*"
         },
         Action = [
           "kms:DescribeKey",
@@ -61,6 +58,14 @@ resource "aws_kms_key" "app" {
           "kms:RevokeGrant"
         ],
         Resource = "*"
+        Condition = {
+          ArnLike = {
+            "aws:PrincipalArn" = [
+              "arn:aws:iam::${var.current_account_id}:role/service-roles/weather-platform-dev-ecs-*",
+              "arn:aws:iam::${var.current_account_id}:role/TerraformDevRole"
+            ]
+          }
+        }
       }
     ]
   })
