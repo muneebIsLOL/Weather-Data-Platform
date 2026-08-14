@@ -8,6 +8,8 @@ module "iam" {
   source           = "./iam"
   current_role_arn = data.aws_iam_session_context.current.issuer_name
   account_id       = data.aws_caller_identity.current.id
+  project_name     = var.project_name
+  environment      = var.environment
 }
 
 module "cloudwatch" {
@@ -59,6 +61,65 @@ module "db" {
 
 module "ecr" {
   source       = "./modules/ecr"
+  project_name = var.project_name
+  environment  = var.environment
+
+  depends_on = [module.iam]
+}
+
+module "ecs_cluster" {
+  source       = "./modules/ecs/cluster"
+  project_name = var.project_name
+  environment  = var.environment
+
+  depends_on = [module.iam]
+}
+
+module "ecs_backend_task_def" {
+  source                = "./modules/ecs/task_definitions/backend"
+  image                 = module.ecr.backend_image
+  project_name          = var.project_name
+  environment           = var.environment
+  app_db_host           = module.db.app_db_host
+  app_db_name           = module.db.app_db_name
+  app_postgres_password = module.db.app_postgres_password
+  app_postgres_user     = module.db.app_postgres_user
+  execution_role_arn    = module.iam.ecs_task_execution_role_arn
+  task_role_arn         = module.iam.ecs_task_role_arn
+
+  depends_on = [module.ecs_cluster]
+}
+
+module "ecs_orchestrator_task_def" {
+  source                            = "./modules/ecs/task_definitions/orchestrator"
+  image                             = module.ecr.orchestrator_image
+  project_name                      = var.project_name
+  environment                       = var.environment
+  app_db_host                       = module.db.app_db_host
+  app_db_name                       = module.db.app_db_name
+  app_postgres_password             = module.db.app_postgres_password
+  app_postgres_user                 = module.db.app_postgres_user
+  airflow_db_sqlalchemy_conn_string = module.db.airflow_db_sqlalchemy_conn_string
+  execution_role_arn                = module.iam.ecs_task_execution_role_arn
+  task_role_arn                     = module.iam.ecs_task_role_arn
+  bucket_name                       = module.s3.bucket
+
+  depends_on = [module.ecs_cluster]
+}
+
+module "ecs_frontend_task_def" {
+  source             = "./modules/ecs/task_definitions/frontend"
+  project_name       = var.project_name
+  environment        = var.environment
+  image              = module.ecr.frontend_image
+  task_role_arn      = module.iam.ecs_task_role_arn
+  execution_role_arn = module.iam.ecs_task_execution_role_arn
+
+  depends_on = [module.ecs_cluster]
+}
+
+module "s3" {
+  source       = "./modules/s3"
   project_name = var.project_name
   environment  = var.environment
 
