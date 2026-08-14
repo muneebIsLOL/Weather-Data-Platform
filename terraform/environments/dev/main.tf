@@ -129,7 +129,7 @@ module "s3" {
 
 module "kms" {
   source             = "./modules/kms"
-  current_account_id = data.aws_caller_identity.current
+  current_account_id = data.aws_caller_identity.current.id
   project_name       = var.project_name
   environment        = var.environment
 }
