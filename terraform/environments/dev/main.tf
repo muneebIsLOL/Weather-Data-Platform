@@ -87,7 +87,7 @@ module "ecs_backend_task_def" {
   execution_role_arn    = module.iam.ecs_task_execution_role_arn
   task_role_arn         = module.iam.ecs_task_role_arn
 
-  depends_on = [module.ecs_cluster]
+  depends_on = [module.ecr]
 }
 
 module "ecs_orchestrator_task_def" {
@@ -104,7 +104,7 @@ module "ecs_orchestrator_task_def" {
   task_role_arn                     = module.iam.ecs_task_role_arn
   bucket_name                       = module.s3.bucket
 
-  depends_on = [module.ecs_cluster]
+  depends_on = [module.ecr]
 }
 
 module "ecs_frontend_task_def" {
@@ -115,7 +115,7 @@ module "ecs_frontend_task_def" {
   task_role_arn      = module.iam.ecs_task_role_arn
   execution_role_arn = module.iam.ecs_task_execution_role_arn
 
-  depends_on = [module.ecs_cluster]
+  depends_on = [module.ecr]
 }
 
 module "s3" {
