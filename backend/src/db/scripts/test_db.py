@@ -6,7 +6,7 @@ def verify_connection():
 
         for attempt in range(1, 6):
             try:
-                engine = get_engine("/app/src/db/global-bundle.pem")
+                engine = get_engine()
                 with engine.connect() as conn:
                     print("Database connection verified successfully.")
                     sys.exit(0)
