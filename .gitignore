@@ -2,8 +2,8 @@ backend/.venv/
 backend/.env
 **/__pycache__/
 *.pyc
-backend/logs/
-*.log
+*.logs
+**logs**
 **/.vscode/
 backend/src/ELT/temp/
 **.local.**
