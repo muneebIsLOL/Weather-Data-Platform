@@ -1,0 +1,61 @@
+services:
+  backend-db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${APP_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${APP_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${APP_DB_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${APP_POSTGRES_USER} -d ${APP_DB_NAME}"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+    networks:
+      - shared-net
+
+  backend-api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file:
+      - .env.production
+    ports:
+      - "127.0.0.1:8000:8000"
+    command: >
+      sh -c "./src/db/scripts/migrations.sh && 
+             uvicorn src.api.main:app --host 0.0.0.0 --port 8000"
+    healthcheck:
+      test: ["CMD-SHELL", "curl http://127.0.0.1:8000/ || >/dev/null"]
+      interval: 15s
+      retries: 2
+      start_period: 3s
+    networks:
+      - shared-net
+    depends_on:
+      backend-db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "127.0.0.1:5173:5173"
+    healthcheck:
+      test: ["CMD-SHELL", "curl http://127.0.0.1:5173 >/dev/null"]
+      interval: 15s
+      retries: 2
+      start_period: 3s
+    depends_on:
+      backend-api:
+        condition: service_healthy
+    networks:
+      - shared-net
+
+networks:
+  shared-net:
+    external: true
+    driver: bridge
+
+volumes:
+  postgres_data:
