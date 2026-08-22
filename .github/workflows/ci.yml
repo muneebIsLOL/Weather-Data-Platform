@@ -44,6 +44,9 @@ jobs:
       - name: Set up Docker Compose
         uses: docker/setup-compose-action@v2
 
+      - name: Create Docker Network
+        run: docker network create shared-net || true
+
       - name: Run Application Tests
         run: |
           CI=true docker compose -f docker-compose.app.yml --profile tests-dep up \
