@@ -12,11 +12,8 @@ Dockerfile
 *.sln
 *.sw?
 *.env.example
+*.env
 
 # Git related files
 README.md
 .gitignore
-
-# Local config files & folders
-pytest.ini
-**tests/
