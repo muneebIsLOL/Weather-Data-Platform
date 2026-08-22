@@ -22,6 +22,9 @@ jobs:
       - name: Set up Docker Compose
         uses: docker/setup-compose-action@v2
 
+      - name: Create Docker Network
+        run: docker network create shared-net || true
+
       - name: Run Application
         run: |
           docker compose -f docker-compose.app.yml --profile app up --wait --build 
