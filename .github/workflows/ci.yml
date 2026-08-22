@@ -27,12 +27,12 @@ jobs:
 
       - name: Run Application
         run: |
-          docker compose -f docker-compose.app.yml --profile app up --wait --build 
+          docker compose -f docker-compose.app.yml --profile app up --wait --build \
           && docker compose -f docker-compose.app.yml --profile app stop
 
       - name: Run Airflow
         run: |
-          docker compose -f airflow/docker-compose.airflow.yml --profile airflow up --build --wait 
+          docker compose -f airflow/docker-compose.airflow.yml --profile airflow up --build --wait \
           && docker compose -f airflow/docker-compose.airflow.yml --profile airflow down -v
 
   unit-tests:
