@@ -1,0 +1,81 @@
+name: CD - Code Deployment
+
+on:
+  workflow_run:
+    workflows:
+      - "CI - Code Validation"
+
+    types:
+      - completed
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      changed_apps: ${{ steps.filter.outputs.changes }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            orchestrator: 'airflow/**'
+            backend: 'backend/**'
+            frontend: 'frontend/**'
+
+  build-and-push:
+    needs: detect-changes
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      needs.detect-changes.outputs.changed_apps != '[]'
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJson(needs.detect-changes.outputs.changed_apps) }}
+
+    steps:
+      - name: Determine Target Environment
+        id: target
+        run: |
+          if [ "${{ github.event.workflow_run.head_branch }}" = "main" ]; then
+            echo "ecr_repo=weather-platform-prod" >> $GITHUB_OUTPUT
+            echo "aws_role=arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformProdRole" >> $GITHUB_OUTPUT
+          else
+            echo "ecr_repo=weather-platform-dev" >> $GITHUB_OUTPUT
+            echo "aws_role=arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformDevRole" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check out Repo
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ steps.target.outputs.aws_role }}
+          aws-region: "ap-south-1"
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set Up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push to ECR
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./${{ matrix.app }}/Dockerfile
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ steps.target.outputs.ecr_repo }}/${{ matrix.app }}:${{ github.event.workflow_run.head_sha }}
