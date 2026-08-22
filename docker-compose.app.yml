@@ -1,12 +1,15 @@
 services:
   backend-db:
-    image: postgres:16
+    profiles:
+      - app
+      - tests-dep
+    image: postgres:17
     environment:
-      POSTGRES_USER: ${APP_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${APP_POSTGRES_PASSWORD}
-      POSTGRES_DB: ${APP_DB_NAME}
+      POSTGRES_USER: ${APP_POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${APP_POSTGRES_PASSWORD:-MyPassword!}
+      POSTGRES_DB: ${APP_DB_NAME:-elt_db}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${APP_POSTGRES_USER} -d ${APP_DB_NAME}"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       retries: 5
       start_period: 5s
@@ -14,18 +17,28 @@ services:
       - shared-net
 
   backend-api:
+    profiles:
+      - app
+      - tests-dep
     build:
       context: .
       dockerfile: backend/Dockerfile
-    env_file:
-      - .env.production
+    environment:
+      APP_POSTGRES_USER: ${APP_POSTGRES_USER:-postgres}
+      APP_POSTGRES_PASSWORD: ${APP_POSTGRES_PASSWORD:-MyPassword!}
+      APP_DB_NAME: ${APP_DB_NAME:-elt_db}
+      APP_AUTH_ACCESS_TOKEN: ${APP_AUTH_ACCESS_TOKEN:-MySecureToken!}
+      APP_DB_HOST: backend-db
+      APP_TEST_POSTGRES_DB: ${APP_TEST_POSTGRES_DB:-test_db}
     ports:
       - "127.0.0.1:8000:8000"
     command: >
-      sh -c "./src/db/scripts/migrations.sh && 
-             uvicorn src.api.main:app --host 0.0.0.0 --port 8000"
+      sh -c "apt-get update && apt-get install -y curl wget && rm -rf /var/lib/apt/lists/*
+      && ./src/db/scripts/migrations.sh 
+      && uvicorn src.api.main:app --host 0.0.0.0 --port 8000"
     healthcheck:
-      test: ["CMD-SHELL", "curl http://127.0.0.1:8000/ || >/dev/null"]
+      test:
+        ["CMD-SHELL", "curl -f http://127.0.0.1:8000/health >/dev/null 2>&1"]
       interval: 15s
       retries: 2
       start_period: 3s
@@ -36,13 +49,15 @@ services:
         condition: service_healthy
 
   web:
+    profiles:
+      - app
     build:
       context: .
       dockerfile: frontend/Dockerfile
     ports:
       - "127.0.0.1:5173:5173"
     healthcheck:
-      test: ["CMD-SHELL", "curl http://127.0.0.1:5173 >/dev/null"]
+      test: ["CMD-SHELL", "curl http://127.0.0.1:5173/health >/dev/null 2>&1"]
       interval: 15s
       retries: 2
       start_period: 3s
@@ -51,6 +66,26 @@ services:
         condition: service_healthy
     networks:
       - shared-net
+
+  unit-tests:
+    profiles:
+      - tests-dep
+    build:
+      context: .
+      dockerfile: test-infra/Dockerfile
+    environment:
+      APP_POSTGRES_USER: ${APP_POSTGRES_USER:-postgres}
+      APP_POSTGRES_PASSWORD: ${APP_POSTGRES_PASSWORD:-MyPassword!}
+      APP_DB_NAME: ${APP_DB_NAME:-elt_db}
+      APP_DB_HOST: backend-db
+      APP_TEST_POSTGRES_DB: ${APP_TEST_POSTGRES_DB:-test_db}
+      APP_AUTH_ACCESS_TOKEN: ${APP_AUTH_ACCESS_TOKEN:-MySecureToken!}
+      CI: ${CI:-false}
+    networks:
+      - shared-net
+    depends_on:
+      backend-api:
+        condition: service_healthy
 
 networks:
   shared-net:
