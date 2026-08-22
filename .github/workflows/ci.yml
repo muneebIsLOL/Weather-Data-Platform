@@ -1,51 +1,52 @@
-# name: Continious Integration
+name: CI - Code Validation
 
-# on:
-#   push:
-#     paths:
-#       - "backend/src/**"
-#       - "frontend/src/**"
-#       - "airflow/dags/**"
-#       - "**/tests/**"
-#       - "requirements/**"
+on:
+  push:
+    paths:
+      - "backend/src/**"
+      - "frontend/src/**"
+      - "airflow/dags/**"
+      - "**/tests/**"
+      - "requirements/**"
+      - "**Dockerfile"
+      - "**.dockerignore"
+  pull_request:
 
-# jobs:
-#   test:
-#     runs-on: self-hosted
-#     steps:
-#       - name: Check out Repo
-#         uses: actions/checkout@v7
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Repo
+        uses: actions/checkout@v7
 
-#       - name: Install Python
-#         uses: actions/setup-python@v6
-  
-#         with:
-#           python-version: "3.14"
+      - name: Set up Docker Compose
+        uses: docker/setup-compose-action@v2
 
-#       - name: Install Python Dependencies
-#         run: |
-#           python -m pip install --upgrade pip
-#           pip install \
-#           -r requirements/base.txt \
-#           -r requirements/airflow.txt \
-#           -r requirements/api.txt
+      - name: Run Application
+        run: |
+          docker compose -f docker-compose.app.yml --profile app up --wait --build 
+          && docker compose -f docker-compose.app.yml --profile app stop
 
-#       - name: Start Backend API
-#         working-directory: backend
-#         run: |
-#           python -m uvicorn src.api.main:app --host 127.0.0.1 --port 8000 &
-#           echo $! > uvicorn.pid
+      - name: Run Airflow
+        run: |
+          docker compose -f airflow/docker-compose.airflow.yml --profile airflow up --build --wait 
+          && docker compose -f airflow/docker-compose.airflow.yml --profile airflow down -v
 
-#       - name: Run backend/tests
-#         run: pytest
-#         working-directory: backend
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Repo
+        uses: actions/checkout@v7
 
-#       - name: Run airflow/tests
-#         run: pytest
-#         working-directory: airflow
-      
-#       - name: Stop Backend API
-#         working-directory: backend
-#         if: always()
-#         run: |
-#           kill $(cat uvicorn.pid)
+      - name: Set up Docker Compose
+        uses: docker/setup-compose-action@v2
+
+      - name: Run Application Tests
+        run: |
+          CI=true docker compose -f docker-compose.app.yml --profile tests-dep up \
+          --build --exit-code-from unit-tests unit-tests
+
+      - name: Run Airflow Tests
+        run: |
+          docker compose -f airflow/docker-compose.airflow.yml --profile tests up \
+          --build --exit-code-from unit-tests unit-tests
