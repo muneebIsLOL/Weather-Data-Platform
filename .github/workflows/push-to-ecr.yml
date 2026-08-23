@@ -9,7 +9,7 @@ on:
       head_branch:
         required: true
         type: string
-      deploy-all:
+      deploy_all:
         required: true
         type: string
 
