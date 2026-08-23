@@ -33,7 +33,7 @@ jobs:
         id: filter
         with:
           filters: |
-            orchestrator:
+            airflow:
               - 'airflow/**'
               - 'requirements/**'
 
@@ -55,7 +55,7 @@ jobs:
         id: apps
         run: |
           if [ "${{ inputs.deploy_all }}" = "true" ]; then
-            echo 'apps=["backend","frontend","orchestrator"]' >> "$GITHUB_OUTPUT"
+            echo 'apps=["backend","frontend","airflow"]' >> "$GITHUB_OUTPUT"
           else
             echo 'apps=${{ needs.detect-changes.outputs.changed_apps }}' >> "$GITHUB_OUTPUT"
           fi
