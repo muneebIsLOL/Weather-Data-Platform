@@ -63,4 +63,5 @@ jobs:
     with:
       head_sha: ${{ github.sha }}
       head_branch: ${{ github.ref_name }}
+      deploy_all: true
     secrets: inherit
