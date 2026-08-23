@@ -8,7 +8,7 @@ resource "aws_ecr_repository" "backend" {
 }
 
 resource "aws_ecr_repository" "orchestrator" {
-  name                 = "${var.project_name}-${var.environment}/orchestrator"
+  name                 = "${var.project_name}-${var.environment}/airflow"
   image_tag_mutability = "IMMUTABLE"
 
   image_scanning_configuration {
