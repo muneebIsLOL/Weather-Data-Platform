@@ -1,23 +1,24 @@
 name: CD - Code Deployment
 
 on:
-  workflow_run:
-    workflows:
-      - "CI - Code Validation"
-
-    types:
-      - completed
+  workflow_call:
+    inputs:
+      head_sha:
+        required: true
+        type: string
+      head_branch:
+        required: true
+        type: string
 
 jobs:
   detect-changes:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     outputs:
       changed_apps: ${{ steps.filter.outputs.changes }}
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ inputs.head_sha }}
           fetch-depth: 0
 
       - uses: dorny/paths-filter@v4
@@ -37,8 +38,7 @@ jobs:
 
   build-and-push:
     needs: detect-changes
-    if: >
-      needs.detect-changes.outputs.changed_apps != '[]'
+    if: needs.detect-changes.outputs.changed_apps != '[]' && needs.detect-changes.outputs.changed_apps != ''
     runs-on: ubuntu-latest
 
     strategy:
@@ -50,7 +50,7 @@ jobs:
       - name: Determine Target Environment
         id: target
         run: |
-          if [ "${{ github.event.workflow_run.head_branch }}" = "main" ]; then
+          if [ "${{ inputs.head_branch }}" = "main" ]; then
             echo "ecr_repo=weather-platform-prod" >> $GITHUB_OUTPUT
             echo "aws_role=arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformProdRole" >> $GITHUB_OUTPUT
           else
@@ -61,7 +61,7 @@ jobs:
       - name: Check out Repo
         uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ inputs.head_sha }}
 
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v6
@@ -85,4 +85,4 @@ jobs:
           context: .
           file: ./${{ matrix.app }}/Dockerfile
           push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/${{ steps.target.outputs.ecr_repo }}/${{ matrix.app }}:${{ github.event.workflow_run.head_sha }}
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ steps.target.outputs.ecr_repo }}/${{ matrix.app }}:${{ inputs.head_sha }}

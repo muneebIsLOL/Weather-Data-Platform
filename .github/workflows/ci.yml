@@ -56,3 +56,11 @@ jobs:
         run: |
           docker compose -f airflow/docker-compose.airflow.yml --profile tests up \
           --build --exit-code-from unit-tests unit-tests
+
+  trigger-cd:
+    needs: validate-code
+    uses: ./.github/workflows/push-to-ecr.yml 
+    with:
+      head_sha: ${{ github.sha }}
+      head_branch: ${{ github.ref_name }}
+    secrets: inherit
