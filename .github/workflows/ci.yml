@@ -65,3 +65,6 @@ jobs:
       head_branch: ${{ github.ref_name }}
       deploy_all: true
     secrets: inherit
+    permissions:
+      id-token: write
+      contents: read
