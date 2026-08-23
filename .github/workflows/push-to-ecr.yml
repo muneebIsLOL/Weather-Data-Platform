@@ -10,6 +10,7 @@ on:
 
 jobs:
   detect-changes:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     outputs:
       changed_apps: ${{ steps.filter.outputs.changes }}
@@ -23,14 +24,20 @@ jobs:
         id: filter
         with:
           filters: |
-            orchestrator: 'airflow/**'
-            backend: 'backend/**'
-            frontend: 'frontend/**'
+            orchestrator:
+              - 'airflow/**'
+              - 'requirements/**'
+
+            backend:
+              - 'backend/**'
+              - 'requirements/**'
+
+            frontend:
+              - 'frontend/**'
 
   build-and-push:
     needs: detect-changes
     if: >
-      github.event.workflow_run.conclusion == 'success' &&
       needs.detect-changes.outputs.changed_apps != '[]'
     runs-on: ubuntu-latest
 
