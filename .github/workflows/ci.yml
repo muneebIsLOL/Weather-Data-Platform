@@ -58,7 +58,7 @@ jobs:
           --build --exit-code-from unit-tests unit-tests
 
   trigger-cd:
-    needs: validate-code
+    needs: unit-tests
     uses: ./.github/workflows/push-to-ecr.yml 
     with:
       head_sha: ${{ github.sha }}
