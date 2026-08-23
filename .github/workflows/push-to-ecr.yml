@@ -9,8 +9,16 @@ on:
       head_branch:
         required: true
         type: string
+      deploy-all:
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
+
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
@@ -36,15 +44,31 @@ jobs:
             frontend:
               - 'frontend/**'
 
-  build-and-push:
+  determine-apps:
     needs: detect-changes
-    if: needs.detect-changes.outputs.changed_apps != '[]' && needs.detect-changes.outputs.changed_apps != ''
+    runs-on: ubuntu-latest
+    outputs:
+      apps: ${{ steps.apps.outputs.apps }}
+
+    steps:
+      - name: Determine apps
+        id: apps
+        run: |
+          if [ "${{ inputs.deploy_all }}" = "true" ]; then
+            echo 'apps=["backend","frontend","orchestrator"]' >> "$GITHUB_OUTPUT"
+          else
+            echo 'apps=${{ needs.detect-changes.outputs.changed_apps }}' >> "$GITHUB_OUTPUT"
+          fi
+
+  build-and-push:
+    needs: determine-apps
+    if: needs.determine-apps.outputs.apps != '[]' && needs.determine-apps.outputs.apps != ''
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        app: ${{ fromJson(needs.detect-changes.outputs.changed_apps) }}
+        app: ${{ fromJson(needs.determine-apps.outputs.apps) }}
 
     steps:
       - name: Determine Target Environment
