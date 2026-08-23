@@ -4,16 +4,9 @@ on:
   workflow_run:
     workflows:
       - "CI - Code Validation"
+
     types:
       - completed
-
-  push:
-    paths:
-      - "backend/**"
-      - "frontend/**"
-      - "airflow/**"
-      - "requirements/**"
-      - "**.dockerignore"
 
 jobs:
   detect-changes:
