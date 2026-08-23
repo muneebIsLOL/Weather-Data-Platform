@@ -30,6 +30,7 @@ services:
       APP_AUTH_ACCESS_TOKEN: ${APP_AUTH_ACCESS_TOKEN:-MySecureToken!}
       APP_DB_HOST: backend-db
       APP_TEST_POSTGRES_DB: ${APP_TEST_POSTGRES_DB:-test_db}
+      CI: ${CI:-false}
     ports:
       - "127.0.0.1:8000:8000"
     command: >
