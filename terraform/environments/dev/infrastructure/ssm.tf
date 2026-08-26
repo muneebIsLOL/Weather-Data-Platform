@@ -1,19 +1,19 @@
 resource "aws_ssm_parameter" "backend_repo" {
   name = "${var.project_name}/${var.environment}/ecr/backend_repo"
   type = "String"
-  value = module.ecr.backend_image
+  value = module.ecr.backend_repo
 }
 
 resource "aws_ssm_parameter" "frontend_repo" {
   name = "${var.project_name}/${var.environment}/ecr/frontend_repo"
   type = "String"
-  value = module.ecr.frontend_image
+  value = module.ecr.frontend_repo
 }
 
 resource "aws_ssm_parameter" "airflow_repo" {
   name = "${var.project_name}/${var.environment}/ecr/airflow_repo"
   type = "String"
-  value = module.ecr.airflow_image
+  value = module.ecr.airflow_repo
 }
 
 resource "aws_ssm_parameter" "app_db_host" {
