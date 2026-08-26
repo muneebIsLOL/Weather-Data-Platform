@@ -19,7 +19,7 @@ permissions:
   pull-requests: write
 
 env:
-  TF_REGION: "ap-south-1"
+  TF_VAR_region: "ap-south-1"
   TF_WORKING_DIRECTORY: terraform/environments/dev/
   TF_VAR_common_tags: '{"Environment": "Development", "Project": "weather-data-platform"}'
   TF_VAR_project_name: "weather-platform"
@@ -73,6 +73,7 @@ jobs:
           sarif_file: "trivy-results.sarif"
 
   bootstrap-dev:
+    needs: code-quality
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -91,7 +92,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformDevRole
-          aws-region: ${{ env.TF_REGION }}
+          aws-region: ${{ env.TF_VAR_region }}
           audience: sts.amazonaws.com
 
       - name: Terraform Init
@@ -100,14 +101,14 @@ jobs:
           -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET }}" \
           -backend-config="key=terraform/dev/bootstrap.tfstate" \
           -backend-config="use_lockfile=true" \
-          -backend-config="region=${{ env.TF_REGION }}"
+          -backend-config="region=${{ env.TF_VAR_region }}"
 
       - name: Terraform Plan
         run: terraform plan -input=false -out=tfplan
 
       - name: Terraform Apply
         if: github.event_name == 'push'
-        run: terraform apply -input=false -auto-approve -var="region=${{ env.TF_REGION }}"
+        run: terraform apply -input=false -auto-approve"
 
       - name: Make Logs Folder
         if: failure()
@@ -123,6 +124,7 @@ jobs:
           path: "${{ env.TF_WORKING_DIRECTORY }}/bootstrap"
 
   deploy-dev:
+    needs: bootstrap-dev
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -142,7 +144,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformDevRole
-          aws-region: ${{ env.TF_REGION }}
+          aws-region: ${{ env.TF_VAR_region }}
           audience: sts.amazonaws.com
 
       - name: Terraform Init
@@ -151,14 +153,12 @@ jobs:
             -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET }}" \
             -backend-config="key=terraform/dev/infrastructure.tfstate" \
             -backend-config="use_lockfile=true" \
-            -backend-config="region=${{ env.TF_REGION }}"
+            -backend-config="region=${{ env.TF_VAR_region }}"
 
       - name: Terraform Plan
         run: terraform plan -input=false -out=tfplan
 
       - name: Terraform Apply
-        env:
-          TF_VAR_region: ${{ env.TF_REGION }}
         if: github.event_name == 'push'
         run: terraform apply -input=false -auto-approve
 
