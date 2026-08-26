@@ -10,7 +10,7 @@ resource "aws_ssm_parameter" "frontend_repo" {
   value = module.ecr.frontend_image
 }
 
-resource "aws_ssm_parameter" "backend_repo" {
+resource "aws_ssm_parameter" "airflow_repo" {
   name = "${var.project_name}/${var.environment}/ecr/airflow_repo"
   type = string
   value = module.ecr.airflow_image
