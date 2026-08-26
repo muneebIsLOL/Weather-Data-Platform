@@ -1,0 +1,176 @@
+name: Terraform CI/CD
+
+on:
+  push:
+    branches:
+      - "aws-migration"
+    paths:
+      - "terraform/environments/dev/**"
+  pull_request:
+    branches:
+      - "aws-migration"
+    paths:
+      - "terraform/environments/dev/**"
+
+permissions:
+  id-token: write
+  contents: read
+  security-events: write
+  pull-requests: write
+
+env:
+  TF_REGION: "ap-south-1"
+  TF_WORKING_DIRECTORY: terraform/environments/dev/
+  TF_VAR_common_tags: '{"Environment": "Development", "Project": "weather-data-platform"}'
+  TF_VAR_project_name: "weather-platform"
+  TF_VAR_environment: "dev"
+
+jobs:
+  code-quality:
+    defaults:
+      run:
+        working-directory: ${{ env.TF_WORKING_DIRECTORY }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Out Repo
+        uses: actions/checkout@v7
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.15.8"
+          terraform_wrapper: false
+
+      - name: Validate Code
+        run: |
+          terraform init -backend=false
+          terraform fmt -check
+          terraform validate
+
+      - name: Generate Trivy SARIF Report
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: "config"
+          scan-ref: ${{ env.TF_WORKING_DIRECTORY }}
+          format: "sarif"
+          output: "trivy-results.sarif"
+          exit-code: "0"
+
+      - name: Block on High and Critical Vulnerabilities
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: "config"
+          scan-ref: ${{ env.TF_WORKING_DIRECTORY }}
+          format: "table"
+          exit-code: "1"
+          severity: "HIGH,CRITICAL"
+          skip-setup-trivy: true
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: "trivy-results.sarif"
+
+  bootstrap-dev:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "${{ env.TF_WORKING_DIRECTORY }}/bootstrap"
+    steps:
+      - name: Check out Repo
+        uses: actions/checkout@v7
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.15.8"
+          terraform_wrapper: false
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformDevRole
+          aws-region: ${{ env.TF_REGION }}
+          audience: sts.amazonaws.com
+
+      - name: Terraform Init
+        run: |
+          terraform init -reconfigure \
+          -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET }}" \
+          -backend-config="key=terraform/dev/bootstrap.tfstate" \
+          -backend-config="use_lockfile=true" \
+          -backend-config="region=${{ env.TF_REGION }}"
+
+      - name: Terraform Plan
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Terraform Apply
+        if: github.event_name == 'push'
+        run: terraform apply -input=false -auto-approve -var="region=${{ env.TF_REGION }}"
+
+      - name: Make Logs Folder
+        if: failure()
+        run: |
+          mkdir -p logs
+          terraform show > logs/plan_error.txt
+
+      - name: Upload Test Logs
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: terraform-bootstrap-dev-logs
+          path: "${{ env.TF_WORKING_DIRECTORY }}/bootstrap"
+
+  deploy-dev:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "${{ env.TF_WORKING_DIRECTORY }}/infrastructure"
+
+    steps:
+      - name: Check Out Repo
+        uses: actions/checkout@v7
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.15.8"
+          terraform_wrapper: false
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformDevRole
+          aws-region: ${{ env.TF_REGION }}
+          audience: sts.amazonaws.com
+
+      - name: Terraform Init
+        run: |
+          terraform init -reconfigure \
+            -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET }}" \
+            -backend-config="key=terraform/dev/infrastructure.tfstate" \
+            -backend-config="use_lockfile=true" \
+            -backend-config="region=${{ env.TF_REGION }}"
+
+      - name: Terraform Plan
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Terraform Apply
+        env:
+          TF_VAR_region: ${{ env.TF_REGION }}
+        if: github.event_name == 'push'
+        run: terraform apply -input=false -auto-approve
+
+      - name: Make Logs Folder
+        if: failure()
+        run: |
+          mkdir -p logs
+          terraform show > logs/plan_error.txt
+
+      - name: Upload Test Logs
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: terraform-dev-infra-logs
+          path: "${{ env.TF_WORKING_DIRECTORY }}/infrastructure"
