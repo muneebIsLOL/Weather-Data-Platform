@@ -44,7 +44,7 @@ jobs:
       - name: Validate Code
         run: |
           terraform init -backend=false
-          terraform fmt -check
+          terraform fmt -check -recursive
           terraform validate
 
       - name: Generate Trivy SARIF Report
