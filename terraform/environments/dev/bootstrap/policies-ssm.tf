@@ -6,28 +6,28 @@ resource "aws_iam_role_policy" "terraform_ssm_policy" {
     Version = "2012-10-17"
 
     Statement = [
-        {
-            Sid = "AllowTagManagement"
-            Effect = "Allow"
-            Action = [
-                "ssm:AddTagsToResource",
-                "ssm:ListTagsForResource",
-                "ssm:RemoveTagsFromResource"
-            ]
-            Resource = "*"
-        },
-        {
-            Sid = "AllowParameterManagement"
-            Effect = "Allow"
-            Action = [
-                "ssm:PutParameter",
-                "ssm:DeleteParameter",
-                "ssm:DeleteParameters",
-                "ssm:DescribeParameters",
-                "ssm:GetParameters*"
-            ]
-            Resource = "*"
-        },
+      {
+        Sid    = "AllowTagManagement"
+        Effect = "Allow"
+        Action = [
+          "ssm:AddTagsToResource",
+          "ssm:ListTagsForResource",
+          "ssm:RemoveTagsFromResource"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowParameterManagement"
+        Effect = "Allow"
+        Action = [
+          "ssm:PutParameter",
+          "ssm:DeleteParameter",
+          "ssm:DeleteParameters",
+          "ssm:DescribeParameters",
+          "ssm:GetParameters*"
+        ]
+        Resource = "*"
+      },
     ]
   })
 }
