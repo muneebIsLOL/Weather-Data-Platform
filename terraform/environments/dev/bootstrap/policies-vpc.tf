@@ -1,5 +1,5 @@
-resource "aws_iam_role_policy" "vpc" {
-  name = "terraform-vpc-permissions"
+resource "aws_iam_role_policy" "terraform_vpc_policy" {
+  name = "vpc-policy"
   role = data.aws_iam_session_context.current.issuer_name
 
   policy = jsonencode({

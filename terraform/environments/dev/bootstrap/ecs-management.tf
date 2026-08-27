@@ -1,5 +1,5 @@
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "${var.project_name}-${var.environment}-ecs-task-execution-role"
+  name = "TerraformDevECSTaskExecRole"
   path = "/service-roles/"
 
   permissions_boundary = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/TerraformDevPermissionsBoundary"
@@ -20,7 +20,7 @@ resource "aws_iam_role" "ecs_task_execution_role" {
 }
 
 resource "aws_iam_role" "ecs_task_role" {
-  name = "${var.project_name}-${var.environment}-ecs-task-role"
+  name = "TerraformDevECSTaskRole"
   path = "/service-roles/"
 
   permissions_boundary = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/TerraformDevPermissionsBoundary"
@@ -39,8 +39,8 @@ resource "aws_iam_role" "ecs_task_role" {
   })
 }
 
-resource "aws_iam_role_policy" "ecs_tasks" {
-  name = "terraform-tasks-permissions"
+resource "aws_iam_role_policy" "ecs_task_policy" {
+  name = "ecs-tasks-policy"
   role = aws_iam_role.ecs_task_role.id
 
   policy = jsonencode({
@@ -74,8 +74,8 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-resource "aws_iam_role_policy" "ecs" {
-  name = "terraform-ecs-permissions"
+resource "aws_iam_role_policy" "terraform_ecs_policy" {
+  name = "ecs-policy"
   role = data.aws_iam_session_context.current.issuer_name
 
   policy = jsonencode({

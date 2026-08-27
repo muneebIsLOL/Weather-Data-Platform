@@ -1,5 +1,5 @@
-resource "aws_iam_role_policy" "s3" {
-  name = "terraform-s3-permissions"
+resource "aws_iam_role_policy" "terraform_s3_permissions" {
+  name = "s3-policy"
   role = data.aws_iam_session_context.current.issuer_name
 
   policy = jsonencode({
