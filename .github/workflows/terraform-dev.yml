@@ -107,7 +107,7 @@ jobs:
         run: terraform plan -input=false -out=tfplan
 
       - name: Terraform Apply
-        run: terraform apply -input=false -auto-approve"
+        run: terraform apply -input=false -auto-approve
 
       - name: Make Logs Folder
         if: failure()
