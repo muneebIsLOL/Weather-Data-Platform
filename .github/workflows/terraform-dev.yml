@@ -107,7 +107,6 @@ jobs:
         run: terraform plan -input=false -out=tfplan
 
       - name: Terraform Apply
-        if: github.event_name == 'push'
         run: terraform apply -input=false -auto-approve"
 
       - name: Make Logs Folder
