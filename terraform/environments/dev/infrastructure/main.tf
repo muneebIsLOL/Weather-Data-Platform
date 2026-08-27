@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {}
 
 module "cloudwatch" {
-  source     = "../../../modules/cloudwatch"
+  source = "../../../modules/cloudwatch"
 }
 
 module "vpc" {
@@ -32,7 +32,7 @@ module "vpc" {
     }
   }
 
-  external_cloudwatch_log_group_arn = data.aws_ssm_parameter.flow_log_role_arn.value
+  external_cloudwatch_log_group_arn = data.aws_ssm_parameter.cloudwatch_role.arn
   external_flow_log_role_arn        = module.cloudwatch.log_group_arn
   depends_on                        = [module.cloudwatch]
 }
