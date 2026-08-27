@@ -24,7 +24,7 @@ resource "aws_iam_role_policy" "terraform_ssm_policy" {
           "ssm:DeleteParameter",
           "ssm:DeleteParameters",
           "ssm:DescribeParameters",
-          "ssm:GetParameters*"
+          "ssm:GetParameter*"
         ]
         Resource = "*"
       },
