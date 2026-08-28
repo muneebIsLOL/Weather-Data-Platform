@@ -2,14 +2,8 @@ name: CI - Code Validation
 
 on:
   push:
-    paths:
-      - "backend/src/**"
-      - "frontend/src/**"
-      - "airflow/dags/**"
-      - "**/tests/**"
-      - "requirements/**"
-      - "**Dockerfile"
-      - "**.dockerignore"
+    tags:
+      - "v*"
   pull_request:
     paths:
       - "backend/src/**"
@@ -66,6 +60,7 @@ jobs:
           --build --exit-code-from unit-tests unit-tests
 
   trigger-cd:
+    if: github.event_name == 'push'
     needs: unit-tests
     uses: ./.github/workflows/push-to-ecr.yml 
     with:
