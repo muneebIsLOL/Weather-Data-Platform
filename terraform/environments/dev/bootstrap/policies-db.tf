@@ -1,6 +1,6 @@
-resource "aws_iam_role_policy" "rds_db_policy" {
-  name = "terraform-database-permissions"
-  role = var.current_role_arn
+resource "aws_iam_role_policy" "terraform_rds_policy" {
+  name = "rds-db-policy"
+  role = data.aws_iam_session_context.current.issuer_name
 
   policy = jsonencode({
     Version = "2012-10-17"

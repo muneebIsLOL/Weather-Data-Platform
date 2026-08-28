@@ -1,6 +1,6 @@
-resource "aws_iam_role_policy" "ecr" {
-  name = "terraform-ecr-policy"
-  role = var.current_role_arn
+resource "aws_iam_role_policy" "terraform_ecr_policy" {
+  name = "ecr-policy"
+  role = data.aws_iam_session_context.current.issuer_name
 
   policy = jsonencode({
     Version = "2012-10-17"

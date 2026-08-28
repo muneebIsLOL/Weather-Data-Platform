@@ -1,8 +1,8 @@
-resource "aws_iam_role" "flow_log_role" {
-  name = "vpc-flow-log-cloudwatch-role"
+resource "aws_iam_role" "cloudwatch_role" {
+  name = "TerraformDevCloudWatchRole"
   path = "/service-roles/"
 
-  permissions_boundary = "arn:aws:iam::${var.account_id}:policy/TerraformDevPermissionsBoundary"
+  permissions_boundary = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/TerraformDevPermissionsBoundary"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -18,9 +18,9 @@ resource "aws_iam_role" "flow_log_role" {
   })
 }
 
-resource "aws_iam_role_policy" "vpc_logs_permissions" {
-  name = "logs-permissions"
-  role = aws_iam_role.flow_log_role.id
+resource "aws_iam_role_policy" "cloudwatch_logs_policy" {
+  name = "cloudwatch-logs-policy"
+  role = aws_iam_role.cloudwatch_role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -41,14 +41,14 @@ resource "aws_iam_role_policy" "vpc_logs_permissions" {
 }
 
 resource "aws_iam_role_policy" "terraform_cloudwatch_policy" {
-  name = "terraform-cloudwatch-permissions"
-  role = var.current_role_arn
+  name = "cloudwatch-logs-policy"
+  role = data.aws_iam_session_context.current.issuer_name
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "AllowLogGroupManagement"
+        Sid    = "AllowLogsGroupManagement"
         Effect = "Allow"
         Action = [
           "logs:CreateLogGroup",
@@ -64,7 +64,7 @@ resource "aws_iam_role_policy" "terraform_cloudwatch_policy" {
         Resource = "*"
       },
       {
-        Sid    = "AllowLogDescribeActions"
+        Sid    = "AllowLogsDescribeActions"
         Effect = "Allow"
         Action = [
           "logs:DescribeLogGroups",

@@ -12,3 +12,7 @@ variable "environment" {
   description = "Deployment environment."
   type        = string
 }
+
+variable "region" {
+  type = string
+}

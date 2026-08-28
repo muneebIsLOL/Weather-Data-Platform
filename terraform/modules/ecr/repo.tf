@@ -7,7 +7,7 @@ resource "aws_ecr_repository" "backend" {
   }
 }
 
-resource "aws_ecr_repository" "orchestrator" {
+resource "aws_ecr_repository" "airflow" {
   name                 = "${var.project_name}-${var.environment}/airflow"
   image_tag_mutability = "IMMUTABLE"
 

@@ -6,19 +6,30 @@ on:
       - "aws-migration"
     paths:
       - "terraform/environments/dev/**"
-      - "terraform/environments/prod/**"
   pull_request:
     branches:
-      - "main"
+      - "aws-migration"
+    paths:
+      - "terraform/environments/dev/**"
 
 permissions:
   id-token: write
   contents: read
-  security-events: write 
+  security-events: write
   pull-requests: write
+
+env:
+  TF_VAR_region: "ap-south-1"
+  TF_WORKING_DIRECTORY: terraform/environments/dev/
+  TF_VAR_common_tags: '{"Environment": "Development", "Project": "weather-data-platform"}'
+  TF_VAR_project_name: "weather-platform"
+  TF_VAR_environment: "dev"
 
 jobs:
   code-quality:
+    defaults:
+      run:
+        working-directory: ${{ env.TF_WORKING_DIRECTORY }}
     runs-on: ubuntu-latest
     steps:
       - name: Check Out Repo
@@ -30,25 +41,17 @@ jobs:
           terraform_version: "1.15.8"
           terraform_wrapper: false
 
-      - name: Validate Dev Code
-        working-directory: terraform/environments/dev
+      - name: Validate Code
         run: |
           terraform init -backend=false
-          terraform fmt -check
-          terraform validate
-
-      - name: Validate Prod Code
-        working-directory: terraform/environments/prod
-        run: |
-          terraform init -backend=false
-          terraform fmt -check
+          terraform fmt -check -recursive
           terraform validate
 
       - name: Generate Trivy SARIF Report
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: "config"
-          scan-ref: "terraform/"
+          scan-ref: ${{ env.TF_WORKING_DIRECTORY }}
           format: "sarif"
           output: "trivy-results.sarif"
           exit-code: "0"
@@ -57,9 +60,9 @@ jobs:
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: "config"
-          scan-ref: "terraform/"
+          scan-ref: ${{ env.TF_WORKING_DIRECTORY }}
           format: "table"
-          exit-code: "1" 
+          exit-code: "1"
           severity: "HIGH,CRITICAL"
           skip-setup-trivy: true
 
@@ -69,11 +72,14 @@ jobs:
         with:
           sarif_file: "trivy-results.sarif"
 
-  deploy-dev:
+  bootstrap-dev:
     needs: code-quality
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "${{ env.TF_WORKING_DIRECTORY }}/bootstrap"
     steps:
-      - name: Check Out Repo
+      - name: Check out Repo
         uses: actions/checkout@v7
 
       - name: Setup Terraform
@@ -81,35 +87,29 @@ jobs:
         with:
           terraform_version: "1.15.8"
           terraform_wrapper: false
-          
+
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformDevRole
-          aws-region: "ap-south-1"
+          aws-region: ${{ env.TF_VAR_region }}
           audience: sts.amazonaws.com
 
       - name: Terraform Init
-        working-directory: terraform/environments/dev
         run: |
           terraform init -reconfigure \
-            -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET }}" \
-            -backend-config="key=terraform/dev/terraform.tfstate" \
-            -backend-config="use_lockfile=true" \
-            -backend-config="region=ap-south-1"
+          -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET }}" \
+          -backend-config="key=terraform/dev/bootstrap.tfstate" \
+          -backend-config="use_lockfile=true" \
+          -backend-config="region=${{ env.TF_VAR_region }}"
 
       - name: Terraform Plan
-        working-directory: terraform/environments/dev
-        if: github.event_name == 'pull_request'
         run: terraform plan -input=false -out=tfplan
 
       - name: Terraform Apply
-        working-directory: terraform/environments/dev
-        if: github.ref == 'refs/heads/aws-migration' && github.event_name == 'push'
         run: terraform apply -input=false -auto-approve
-        
+
       - name: Make Logs Folder
-        working-directory: terraform/environments/dev
         if: failure()
         run: |
           mkdir -p logs
@@ -119,13 +119,16 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: terraform-dev-logs
-          path: terraform/environments/dev/logs/
+          name: terraform-bootstrap-dev-logs
+          path: "${{ env.TF_WORKING_DIRECTORY }}/bootstrap"
 
-  deploy-prod:
-    needs: deploy-dev
+  deploy-dev:
+    needs: bootstrap-dev
     runs-on: ubuntu-latest
-    environment: production
+    defaults:
+      run:
+        working-directory: "${{ env.TF_WORKING_DIRECTORY }}/infrastructure"
+
     steps:
       - name: Check Out Repo
         uses: actions/checkout@v7
@@ -139,31 +142,26 @@ jobs:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformProdRole
-          aws-region: "ap-south-1"
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformDevRole
+          aws-region: ${{ env.TF_VAR_region }}
           audience: sts.amazonaws.com
 
       - name: Terraform Init
-        working-directory: terraform/environments/prod
         run: |
           terraform init -reconfigure \
             -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET }}" \
-            -backend-config="key=terraform/prod/terraform.tfstate" \
+            -backend-config="key=terraform/dev/infrastructure.tfstate" \
             -backend-config="use_lockfile=true" \
-            -backend-config="region=ap-south-1"
+            -backend-config="region=${{ env.TF_VAR_region }}"
 
       - name: Terraform Plan
-        working-directory: terraform/environments/prod
-        if: github.event_name == 'pull_request'
         run: terraform plan -input=false -out=tfplan
 
       - name: Terraform Apply
-        working-directory: terraform/environments/prod
-        if: github.ref == 'refs/heads/aws-migration' && github.event_name == 'push'
+        if: github.event_name == 'push'
         run: terraform apply -input=false -auto-approve
 
       - name: Make Logs Folder
-        working-directory: terraform/environments/prod
         if: failure()
         run: |
           mkdir -p logs
@@ -173,5 +171,5 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: terraform-prod-logs
-          path: terraform/environments/prod/logs/
+          name: terraform-dev-infra-logs
+          path: "${{ env.TF_WORKING_DIRECTORY }}/infrastructure"
