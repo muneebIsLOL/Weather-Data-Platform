@@ -58,7 +58,7 @@ jobs:
 
   deploy-dev:
     needs: determine-apps
-    if: needs.determine-apps.outputs.apps != '[]' && needs.determine-apps.outputs.apps != '' && inputs.head_branch == 'aws-migration'
+    if: needs.determine-apps.outputs.apps != '[]' && needs.determine-apps.outputs.apps != '' && (inputs.head_branch == 'aws-migration' || startsWith(inputs.head_branch, 'v'))
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -108,7 +108,7 @@ jobs:
 
   deploy-prod:
     needs: determine-apps
-    if: needs.determine-apps.outputs.apps != '[]' && needs.determine-apps.outputs.apps != '' && inputs.head_branch == 'main'
+    if: needs.determine-apps.outputs.apps != '[]' && needs.determine-apps.outputs.apps != '' && (inputs.head_branch == 'aws-migration' || startsWith(inputs.head_branch, 'v'))
     runs-on: ubuntu-latest
     environment: production
     strategy:
