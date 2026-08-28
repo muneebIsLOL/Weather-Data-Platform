@@ -107,6 +107,7 @@ jobs:
         run: terraform plan -input=false -out=tfplan
 
       - name: Terraform Apply
+        if: github.event_name == 'push'
         run: terraform apply -input=false -auto-approve
 
       - name: Make Logs Folder
@@ -159,7 +160,7 @@ jobs:
 
       - name: Terraform Apply
         if: github.event_name == 'push'
-        run: terraform apply -input=false -auto-approve
+        run: terraform apply -input=false -auto-approve -refresh-only
 
       - name: Make Logs Folder
         if: failure()
