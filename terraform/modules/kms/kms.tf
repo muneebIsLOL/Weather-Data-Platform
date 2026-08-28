@@ -61,7 +61,7 @@ resource "aws_kms_key" "app" {
         Condition = {
           ArnLike = {
             "aws:PrincipalArn" = [
-              "arn:aws:iam::${var.current_account_id}:role/service-roles/weather-platform-dev-ecs-*",
+              "arn:aws:iam::${var.current_account_id}:role/service-roles/TerraformDevECSTask*",
               "arn:aws:iam::${var.current_account_id}:role/TerraformDevRole"
             ]
           }
