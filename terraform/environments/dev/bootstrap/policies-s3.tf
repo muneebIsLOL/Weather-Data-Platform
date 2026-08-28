@@ -15,7 +15,9 @@ resource "aws_iam_role_policy" "terraform_s3_permissions" {
           "s3:PutObject",
           "s3:Describe*",
           "s3:ListObjects",
-          "s3:GetObject*"
+          "s3:GetObject*",
+          "s3:ListBucket",
+          "s3:DeleteObject"
         ]
         Resource = "*"
       },
