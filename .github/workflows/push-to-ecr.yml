@@ -108,7 +108,7 @@ jobs:
 
   deploy-prod:
     needs: determine-apps
-    if: needs.determine-apps.outputs.apps != '[]' && needs.determine-apps.outputs.apps != '' && (inputs.head_branch == 'aws-migration' || startsWith(inputs.head_branch, 'v'))
+    if: needs.determine-apps.outputs.apps != '[]' && needs.determine-apps.outputs.apps != '' && (inputs.head_branch == 'main' || startsWith(inputs.head_branch, 'v'))
     runs-on: ubuntu-latest
     environment: production
     strategy:
