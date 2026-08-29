@@ -1,3 +1,5 @@
+data "aws_region" "current" {}
+
 resource "aws_ecs_task_definition" "backend" {
   family = "${var.project_name}-${var.environment}-orchestrator"
 
@@ -80,7 +82,7 @@ resource "aws_ecs_task_definition" "backend" {
                 },
                 {
                     "name": "AIRFLOW_UID",
-                    "value": "1000"
+                    "value": "0"
                 },
                 {
                     "name": "AIRFLOW__CORE__FERNET_KEY",
@@ -144,7 +146,7 @@ resource "aws_ecs_task_definition" "backend" {
                 "options": {
                     "awslogs-group": "/ecs/${var.project_name}-${var.environment}-orchestrator",
                     "awslogs-create-group": "true",
-                    "awslogs-region": "ap-south-1",
+                    "awslogs-region": ${data.aws_region.current.id},
                     "awslogs-stream-prefix": "ecs"
                 },
                 "secretOptions": []
@@ -293,7 +295,7 @@ resource "aws_ecs_task_definition" "backend" {
                 "options": {
                     "awslogs-group": "/ecs/${var.project_name}-${var.environment}-orchestrator",
                     "awslogs-create-group": "true",
-                    "awslogs-region": "ap-south-1",
+                    "awslogs-region": ${data.aws_region.current.id},
                     "awslogs-stream-prefix": "ecs"
                 },
                 "secretOptions": []
@@ -447,7 +449,7 @@ resource "aws_ecs_task_definition" "backend" {
                 "options": {
                     "awslogs-group": "/ecs/${var.project_name}-${var.environment}-orchestrator",
                     "awslogs-create-group": "true",
-                    "awslogs-region": "ap-south-1",
+                    "awslogs-region": ${data.aws_region.current.id},
                     "awslogs-stream-prefix": "ecs"
                 },
                 "secretOptions": []
@@ -455,7 +457,7 @@ resource "aws_ecs_task_definition" "backend" {
             "healthCheck": {
                 "command": [
                     "CMD-SHELL",
-                    "celery --app airflow.providers.celery.executors.celery_executor.app inspect ping -d \"celery@$HOSTNAME\" || celery --app airflow.executors.celery_executor.app inspect ping -d \"celery@$HOSTNAME\""
+                    'python -m celery --app airflow.providers.celery.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}"'
                 ],
                 "interval": 30,
                 "timeout": 10,
@@ -596,7 +598,7 @@ resource "aws_ecs_task_definition" "backend" {
                 "options": {
                     "awslogs-group": "/ecs/${var.project_name}-${var.environment}-orchestrator",
                     "awslogs-create-group": "true",
-                    "awslogs-region": "ap-south-1",
+                    "awslogs-region": ${data.aws_region.current.id},
                     "awslogs-stream-prefix": "ecs"
                 },
                 "secretOptions": []
@@ -604,7 +606,7 @@ resource "aws_ecs_task_definition" "backend" {
             "healthCheck": {
                 "command": [
                     "CMD-SHELL",
-                    "airflow jobs check --job-type TriggererJob --hostname \"$HOSTNAME\""
+                    'python -m airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"'
                 ],
                 "interval": 30,
                 "timeout": 10,
@@ -626,7 +628,7 @@ resource "aws_ecs_task_definition" "backend" {
                 "options": {
                     "awslogs-group": "/ecs/${var.project_name}-${var.environment}-orchestrator",
                     "awslogs-create-group": "true",
-                    "awslogs-region": "ap-south-1",
+                    "awslogs-region": ${data.aws_region.current.id},
                     "awslogs-stream-prefix": "ecs"
                 },
                 "secretOptions": []
@@ -775,7 +777,7 @@ resource "aws_ecs_task_definition" "backend" {
                 "options": {
                     "awslogs-group": "/ecs/${var.project_name}-${var.environment}-orchestrator",
                     "awslogs-create-group": "true",
-                    "awslogs-region": "ap-south-1",
+                    "awslogs-region": ${data.aws_region.current.id},
                     "awslogs-stream-prefix": "ecs"
                 },
                 "secretOptions": []
@@ -783,7 +785,7 @@ resource "aws_ecs_task_definition" "backend" {
             "healthCheck": {
                 "command": [
                     "CMD-SHELL",
-                    "airflow jobs check --job-type DagProcessorJob --hostname \"$HOSTNAME\""
+                    'python -m airflow jobs check --job-type DagProcessorJob --hostname "$${HOSTNAME}"'
                 ],
                 "interval": 10,
                 "timeout": 30,
@@ -915,7 +917,7 @@ resource "aws_ecs_task_definition" "backend" {
                 "options": {
                     "awslogs-group": "/ecs/${var.project_name}-${var.environment}-orchestrator",
                     "awslogs-create-group": "true",
-                    "awslogs-region": "ap-south-1",
+                    "awslogs-region": ${data.aws_region.current.id},
                     "awslogs-stream-prefix": "ecs"
                 },
                 "secretOptions": []
