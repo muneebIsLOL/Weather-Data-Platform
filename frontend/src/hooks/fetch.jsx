@@ -4,7 +4,7 @@ function useFetch(endpoint) {
     const [data, setData] = useState(null)
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
-    const host = import.meta.env.VITE_HOST_URL;
+    const host = window.__env__.VITE_HOST_URL;
 
     useEffect(() => {
         setLoading(true);
