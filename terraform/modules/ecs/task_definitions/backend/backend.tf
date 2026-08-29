@@ -1,3 +1,5 @@
+data "aws_region" "current" {}
+
 resource "aws_ecs_task_definition" "backend" {
   family = "${var.project_name}-${var.environment}-backend"
 
@@ -37,6 +39,10 @@ resource "aws_ecs_task_definition" "backend" {
             {
                 "name": "APP_AUTH_ACCESS_TOKEN",
                 "value": "MySecureToken!"
+            },
+            {
+                "name": "CI",
+                "value": "false"
             }
         ],
         "mountPoints": [],
@@ -60,7 +66,7 @@ resource "aws_ecs_task_definition" "backend" {
         "healthCheck": {
             "command": [
                 "CMD-SHELL",
-                "curl -f http://127.0.0.1:8000/docs || >/dev/null"
+                "curl -f http://127.0.0.1:8000/health >/dev/null 2>&1"
             ],
             "interval": 30,
             "timeout": 5,

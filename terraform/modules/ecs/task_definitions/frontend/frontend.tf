@@ -1,3 +1,5 @@
+data "aws_region" "current" {}
+
 resource "aws_ecs_task_definition" "frontend" {
   family = "${var.project_name}-${var.environment}-frontend"
 
