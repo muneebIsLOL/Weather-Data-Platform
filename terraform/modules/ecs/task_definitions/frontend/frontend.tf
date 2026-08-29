@@ -18,7 +18,12 @@ resource "aws_ecs_task_definition" "frontend" {
                 }
             ],
             "essential": true,
-            "environment": [],
+            "environment": [
+                {
+                    "name": "VITE_HOST_URL"
+                    "value": ""
+                }
+            ],
             "environmentFiles": [],
             "mountPoints": [],
             "volumesFrom": [],
@@ -28,7 +33,7 @@ resource "aws_ecs_task_definition" "frontend" {
                 "options": {
                     "awslogs-group": "/ecs/${var.project_name}-${var.environment}-frontend",
                     "awslogs-create-group": "true",
-                    "awslogs-region": "ap-south-1",
+                    "awslogs-region": ${data.aws_region.current.id},
                     "awslogs-stream-prefix": "ecs"
                 },
                 "secretOptions": []
@@ -36,7 +41,7 @@ resource "aws_ecs_task_definition" "frontend" {
             "healthCheck": {
                 "command": [
                     "CMD-SHELL",
-                    "curl -f http://127.0.0.1:5173 || >/dev/null"
+                    "curl -f http://127.0.0.1:5173/health >/dev/null 2>&1"
                 ],
                 "interval": 10,
                 "timeout": 30,
