@@ -20,50 +20,9 @@ env:
 
 jobs:
   code-quality:
-    defaults:
-      run:
-        working-directory: ${{ env.TF_WORKING_DIRECTORY }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check Out Repo
-        uses: actions/checkout@v7
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: "1.15.8"
-          terraform_wrapper: false
-
-      - name: Validate Code
-        run: |
-          terraform init -backend=false
-          terraform fmt -check -recursive
-          terraform validate
-
-      - name: Generate Trivy SARIF Report
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          scan-type: "config"
-          scan-ref: ${{ env.TF_WORKING_DIRECTORY }}
-          format: "sarif"
-          output: "trivy-results.sarif"
-          exit-code: "0"
-
-      - name: Block on High and Critical Vulnerabilities
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          scan-type: "config"
-          scan-ref: ${{ env.TF_WORKING_DIRECTORY }}
-          format: "table"
-          exit-code: "1"
-          severity: "HIGH,CRITICAL"
-          skip-setup-trivy: true
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        if: always()
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: "trivy-results.sarif"
+    uses: ./.github/workflows/reusable-terraform.yml
+    with:
+      working_directory: terraform/environments/prod/
 
   bootstrap-prod:
     needs: code-quality
