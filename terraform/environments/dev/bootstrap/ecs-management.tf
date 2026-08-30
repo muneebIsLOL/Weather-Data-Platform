@@ -118,7 +118,7 @@ resource "aws_iam_role_policy" "terraform_ecs_policy" {
         Resource = "*"
       },
       {
-        Sid = "AllowServiceManagement"
+        Sid    = "AllowServiceManagement"
         Effect = "Allow"
         Action = [
           "ecs:CreateService",

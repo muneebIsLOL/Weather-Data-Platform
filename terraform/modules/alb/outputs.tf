@@ -14,6 +14,6 @@ output "backend_tg_arn" {
 }
 
 output "alb_dns" {
-  type = string
+  type  = string
   value = aws_lb.ecs_load_balancer.dns_name
 }

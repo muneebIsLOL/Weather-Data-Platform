@@ -42,8 +42,8 @@ module "ecs_frontend_task_def" {
   environment        = var.environment
   task_role_arn      = data.aws_ssm_parameter.ecs_task_role_arn.value
   execution_role_arn = data.aws_ssm_parameter.ecs_task_execution_role_arn.value
-  vite_host_url = module.ecs_alb.alb_dns
-  depends_on = [module.ecs_alb]
+  vite_host_url      = module.ecs_alb.alb_dns
+  depends_on         = [module.ecs_alb]
 }
 
 
