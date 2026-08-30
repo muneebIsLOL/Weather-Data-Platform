@@ -41,7 +41,7 @@ module "db" {
   source       = "../../../modules/databases"
   project_name = var.project_name
   environment  = var.environment
-  subnet_ids   = module.vpc.subnet_ids
+  subnet_ids   = module.vpc.private_subnets
   sg_ids       = [module.vpc.postgres_sg_id]
   depends_on   = [module.vpc]
 }
