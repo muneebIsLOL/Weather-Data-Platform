@@ -116,6 +116,20 @@ resource "aws_iam_role_policy" "terraform_ecs_policy" {
           "ecs:ListTagsForResource"
         ]
         Resource = "*"
+      },
+      {
+        Sid = "AllowServiceManagement"
+        Effect = "Allow"
+        Action = [
+          "ecs:CreateService",
+          "ecs:DeleteService",
+          "ecs:ListServices",
+          "ecs:UpdateService",
+          "ecs:DescribeService*",
+          "ecs:StopServiceDeployment"
+        ]
+
+        Resource = "*"
       }
     ]
   })
