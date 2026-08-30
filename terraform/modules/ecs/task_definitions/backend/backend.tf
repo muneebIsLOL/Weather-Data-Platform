@@ -43,6 +43,10 @@ resource "aws_ecs_task_definition" "backend" {
             {
                 "name": "CI",
                 "value": "false"
+            },
+            {
+                "name": APP_DB_CERT_PATH
+                "value": "/app/src/db/global-bundle.pem"
             }
         ],
         "mountPoints": [],
