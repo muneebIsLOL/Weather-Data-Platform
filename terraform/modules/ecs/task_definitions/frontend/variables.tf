@@ -17,3 +17,7 @@ variable "task_role_arn" {
 variable "execution_role_arn" {
   type = string
 }
+
+variable "vite_host_url" {
+  type = string
+}
