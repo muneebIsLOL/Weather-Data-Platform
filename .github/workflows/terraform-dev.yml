@@ -133,3 +133,54 @@ jobs:
         with:
           name: terraform-dev-infra-logs
           path: "${{ env.TF_WORKING_DIRECTORY }}/infrastructure"
+
+  application-dev:
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "${{ env.TF_WORKING_DIRECTORY }}/application"
+    steps:
+      - name: Check out Repo
+        uses: actions/checkout@v7
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.15.8"
+          terraform_wrapper: false
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformDevRole
+          aws-region: ${{ env.TF_VAR_region }}
+          audience: sts.amazonaws.com
+
+      - name: Terraform Init
+        run: |
+          terraform init -reconfigure \
+          -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET }}" \
+          -backend-config="key=terraform/dev/application.tfstate" \
+          -backend-config="use_lockfile=true" \
+          -backend-config="region=${{ env.TF_VAR_region }}"
+
+      - name: Terraform Plan
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Terraform Apply
+        run: terraform apply -input=false -auto-approve
+
+      - name: Make Logs Folder
+        if: failure()
+        run: |
+          mkdir -p logs
+          terraform show > logs/plan_error.txt
+
+      - name: Upload Test Logs
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: terraform-application-dev-logs
+          path: "${{ env.TF_WORKING_DIRECTORY }}/application"
+  
