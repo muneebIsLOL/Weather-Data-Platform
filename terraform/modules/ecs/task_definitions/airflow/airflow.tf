@@ -1,7 +1,7 @@
 data "aws_region" "current" {}
 
-resource "aws_ecs_task_definition" "backend" {
-  family = "${var.project_name}-${var.environment}-orchestrator"
+resource "aws_ecs_task_definition" "airflow" {
+  family = "${var.project_name}-${var.environment}-airflow"
 
   container_definitions = <<TASK_DEFINITION
 [
@@ -144,7 +144,7 @@ resource "aws_ecs_task_definition" "backend" {
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
-                    "awslogs-group": "/ecs/${var.project_name}-${var.environment}-orchestrator",
+                    "awslogs-group": "/ecs/${var.project_name}-${var.environment}-airflow",
                     "awslogs-create-group": "true",
                     "awslogs-region": ${data.aws_region.current.id},
                     "awslogs-stream-prefix": "ecs"
@@ -293,7 +293,7 @@ resource "aws_ecs_task_definition" "backend" {
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
-                    "awslogs-group": "/ecs/${var.project_name}-${var.environment}-orchestrator",
+                    "awslogs-group": "/ecs/${var.project_name}-${var.environment}-airflow",
                     "awslogs-create-group": "true",
                     "awslogs-region": ${data.aws_region.current.id},
                     "awslogs-stream-prefix": "ecs"
@@ -447,7 +447,7 @@ resource "aws_ecs_task_definition" "backend" {
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
-                    "awslogs-group": "/ecs/${var.project_name}-${var.environment}-orchestrator",
+                    "awslogs-group": "/ecs/${var.project_name}-${var.environment}-airflow",
                     "awslogs-create-group": "true",
                     "awslogs-region": ${data.aws_region.current.id},
                     "awslogs-stream-prefix": "ecs"
@@ -596,7 +596,7 @@ resource "aws_ecs_task_definition" "backend" {
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
-                    "awslogs-group": "/ecs/${var.project_name}-${var.environment}-orchestrator",
+                    "awslogs-group": "/ecs/${var.project_name}-${var.environment}-airflow",
                     "awslogs-create-group": "true",
                     "awslogs-region": ${data.aws_region.current.id},
                     "awslogs-stream-prefix": "ecs"
@@ -626,7 +626,7 @@ resource "aws_ecs_task_definition" "backend" {
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
-                    "awslogs-group": "/ecs/${var.project_name}-${var.environment}-orchestrator",
+                    "awslogs-group": "/ecs/${var.project_name}-${var.environment}-airflow",
                     "awslogs-create-group": "true",
                     "awslogs-region": ${data.aws_region.current.id},
                     "awslogs-stream-prefix": "ecs"
@@ -775,7 +775,7 @@ resource "aws_ecs_task_definition" "backend" {
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
-                    "awslogs-group": "/ecs/${var.project_name}-${var.environment}-orchestrator",
+                    "awslogs-group": "/ecs/${var.project_name}-${var.environment}-airflow",
                     "awslogs-create-group": "true",
                     "awslogs-region": ${data.aws_region.current.id},
                     "awslogs-stream-prefix": "ecs"
@@ -915,7 +915,7 @@ resource "aws_ecs_task_definition" "backend" {
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
-                    "awslogs-group": "/ecs/${var.project_name}-${var.environment}-orchestrator",
+                    "awslogs-group": "/ecs/${var.project_name}-${var.environment}-airflow",
                     "awslogs-create-group": "true",
                     "awslogs-region": ${data.aws_region.current.id},
                     "awslogs-stream-prefix": "ecs"
