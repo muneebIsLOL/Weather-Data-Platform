@@ -56,3 +56,31 @@ data "aws_ssm_parameter" "airflow_db_sqlalchemy_conn_string" {
 data "aws_ssm_parameter" "bucket" {
   name = "/${var.project_name}/${var.environment}/s3/bucket"
 }
+
+data "aws_ssm_paramater" "alb_sg" {
+  name = "/${var.project_name}/${var.environment}/networking/alb_sg"
+}
+
+data "aws_ssm_paramater" "ecs_sg" {
+  name = "/${var.project_name}/${var.environment}/networking/ecs_services_sg"
+}
+
+data "aws_ssm_paramater" "alb_subnets" {
+  name = "/${var.project_name}/${var.environment}/networking/alb_subnets"
+}
+
+data "aws_ssm_paramater" "vpc_id" {
+  name = "/${var.project_name}/${var.environment}/networking/vpc_id"
+}
+
+data "aws_ssm_parameter" "cluster_id" {
+  name = "/${var.project_name}/${var.environment}/ecs/cluster_id"
+}
+
+data "aws_ssm_parameter" "public_subnets" {
+  name = "/${var.project_name}/${var.environment}/networking/public_subnets"
+}
+
+data "aws_ssm_parameter" "private_subnets" {
+  name = "/${var.project_name}/${var.environment}/networking/private_subnets"
+}
