@@ -21,7 +21,7 @@ resource "aws_ecs_task_definition" "frontend" {
             "environment": [
                 {
                     "name": "VITE_HOST_URL"
-                    "value": ""
+                    "value": ${var.vite_host_url}
                 }
             ],
             "environmentFiles": [],
