@@ -8,7 +8,7 @@ resource "aws_ecs_task_definition" "airflow" {
     [
         {
             "name": "airflow-apiserver",
-            "image": ${var.image},
+            "image": "${var.image}",
             "cpu": 0,
             "portMappings": [
                     {
@@ -126,7 +126,7 @@ resource "aws_ecs_task_definition" "airflow" {
                 },
                 {
                     "name": "AIRFLOW__ENCRYPT_S3_LOGS",
-                    "value": False
+                    "value": "False"
                 }
             ],
             "mountPoints": [],
@@ -297,7 +297,7 @@ resource "aws_ecs_task_definition" "airflow" {
         },
         {
             "name": "airflow-scheduler",
-            "image": ${var.image},
+            "image": "${var.image}",
             "cpu": 0,
             "portMappings": [],
             "essential": true,
@@ -408,7 +408,7 @@ resource "aws_ecs_task_definition" "airflow" {
                 },
                 {
                     "name": "AIRFLOW__ENCRYPT_S3_LOGS",
-                    "value": False
+                    "value": "False"
                 }
             ],
             "mountPoints": [],
@@ -447,7 +447,7 @@ resource "aws_ecs_task_definition" "airflow" {
         },
         {
             "name": "airflow-worker",
-            "image": ${var.image},
+            "image": "${var.image}",
             "cpu": 0,
             "portMappings": [],
             "essential": false,
@@ -558,7 +558,7 @@ resource "aws_ecs_task_definition" "airflow" {
                 },
                 {
                     "name": "AIRFLOW__ENCRYPT_S3_LOGS",
-                    "value": False
+                    "value": "False"
                 }
             ],
             "mountPoints": [],
@@ -601,7 +601,7 @@ resource "aws_ecs_task_definition" "airflow" {
         },
         {
             "name": "airflow-triggerer",
-            "image": ${var.image},
+            "image": "${var.image}",
             "cpu": 0,
             "portMappings": [],
             "essential": false,
@@ -711,7 +711,7 @@ resource "aws_ecs_task_definition" "airflow" {
                 },
                 {
                     "name": "AIRFLOW__ENCRYPT_S3_LOGS",
-                    "value": False
+                    "value": "False"
                 }
             ],
             "mountPoints": [],
@@ -780,7 +780,7 @@ resource "aws_ecs_task_definition" "airflow" {
         },
         {
             "name": "airflow-dag-processor",
-            "image": ${var.image},
+            "image": "${var.image}",
             "cpu": 0,
             "portMappings": [],
             "essential": false,
@@ -890,7 +890,7 @@ resource "aws_ecs_task_definition" "airflow" {
                 },
                 {
                     "name": "AIRFLOW__ENCRYPT_S3_LOGS",
-                    "value": False
+                    "value": "False"
                 }
             ],
             "mountPoints": [],
@@ -929,7 +929,7 @@ resource "aws_ecs_task_definition" "airflow" {
         },
         {
             "name": "airflow-init",
-            "image": ${var.image},
+            "image": "${var.image}",
             "cpu": 0,
             "portMappings": [],
             "essential": false,
@@ -1040,7 +1040,7 @@ resource "aws_ecs_task_definition" "airflow" {
                 },
                 {
                     "name": "AIRFLOW__ENCRYPT_S3_LOGS",
-                    "value": False
+                    "value": "False"
                 }
             ],
             "mountPoints": [],

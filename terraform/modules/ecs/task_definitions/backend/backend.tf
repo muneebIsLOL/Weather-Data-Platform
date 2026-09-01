@@ -7,7 +7,7 @@ resource "aws_ecs_task_definition" "backend" {
 [
     {
         "name": "backend-api",
-        "image": ${var.image},
+        "image": "${var.image}",
         "cpu": 0,
         "portMappings": [
             {
@@ -45,7 +45,7 @@ resource "aws_ecs_task_definition" "backend" {
                 "value": "false"
             },
             {
-                "name": APP_DB_CERT_PATH
+                "name": "APP_DB_CERT_PATH"
                 "value": "/app/src/db/global-bundle.pem"
             }
         ],
@@ -80,7 +80,7 @@ resource "aws_ecs_task_definition" "backend" {
     },
     {
         "name": "backend-db",
-        "image": ${var.image},
+        "image": "${var.image}",
         "cpu": 0,
         "portMappings": [],
         "essential": false,
