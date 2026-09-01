@@ -5,7 +5,6 @@ resource "aws_ecs_task_definition" "airflow" {
 
   container_definitions = <<TASK_DEFINITION
 [
-    [
         {
             "name": "airflow-apiserver",
             "image": "${var.image}",
