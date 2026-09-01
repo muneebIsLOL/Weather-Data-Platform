@@ -52,11 +52,7 @@ resource "aws_ecs_task_definition" "backend" {
             "options": {
                 "awslogs-group": "/ecs/${var.project_name}-${var.environment}-backend",
                 "awslogs-create-group": "true",
-<<<<<<< HEAD
-                "awslogs-region": "ap-south-1",
-=======
                 "awslogs-region": "${data.aws_region.current.region}",
->>>>>>> 93bd191 (fix(ecs): enclose every variable inside quotes to prevent syntax and type errors)
                 "awslogs-stream-prefix": "ecs"
             },
             "secretOptions": []
@@ -98,15 +94,11 @@ resource "aws_ecs_task_definition" "backend" {
             },
             {
                 "name": "APP_POSTGRES_USER",
-<<<<<<< HEAD
-                "value": ${var.app_postgres_user}
-=======
                 "value": "${var.app_postgres_user}"
             },
             {
                 "name": "CI",
                 "value": "false"
->>>>>>> 93bd191 (fix(ecs): enclose every variable inside quotes to prevent syntax and type errors)
             }
         ],
         "mountPoints": [],
@@ -116,36 +108,13 @@ resource "aws_ecs_task_definition" "backend" {
             "options": {
                 "awslogs-group": "/ecs/${var.project_name}-${var.environment}-backend",
                 "awslogs-create-group": "true",
-<<<<<<< HEAD
-                "awslogs-region": "ap-south-1",
-=======
                 "awslogs-region": "${data.aws_region.current.region}",
->>>>>>> 93bd191 (fix(ecs): enclose every variable inside quotes to prevent syntax and type errors)
                 "awslogs-stream-prefix": "ecs"
             },
             "secretOptions": []
         },
         "systemControls": []
-<<<<<<< HEAD
-    },
-    "taskRoleArn": ${var.task_role_arn},
-    "executionRoleArn": ${var.execution_role_arn},
-    "networkMode": "awsvpc",
-    "volumes": [],
-    "placementConstraints": [],
-    "requiresCompatibilities": [
-        "FARGATE"
-    ],
-    "cpu": "1024",
-    "memory": "4096",
-    "runtimePlatform": {
-        "cpuArchitecture": "X86_64",
-        "operatingSystemFamily": "LINUX"
-    },
-    "enableFaultInjection": false
-=======
     }
->>>>>>> 23c1335 (refactor(terraform): properly define ECS tasks with separate resource configurations)
 ]
     TASK_DEFINITION
 

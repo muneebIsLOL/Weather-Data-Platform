@@ -5,7 +5,6 @@ resource "aws_ecs_task_definition" "airflow" {
 
   container_definitions = <<TASK_DEFINITION
 [
-<<<<<<< HEAD
     [
         {
             "name": "airflow-apiserver",
@@ -147,15 +146,10 @@ resource "aws_ecs_task_definition" "airflow" {
                 "options": {
                     "awslogs-group": "/ecs/${var.project_name}-${var.environment}-airflow",
                     "awslogs-create-group": "true",
-<<<<<<< HEAD
-                    "awslogs-region": ${data.aws_region.current.id},
-=======
                     "awslogs-region": "${data.aws_region.current.region}",
->>>>>>> 93bd191 (fix(ecs): enclose every variable inside quotes to prevent syntax and type errors)
                     "awslogs-stream-prefix": "ecs"
                 },
                 "secretOptions": []
-=======
     {
         "name": "airflow-apiserver",
         "image": "${var.image}",
@@ -177,7 +171,6 @@ resource "aws_ecs_task_definition" "airflow" {
             {
                 "name": "AIRFLOW__CORE__EXECUTION_API_SERVER_URL",
                 "value": "http://localhost:8080/execution/"
->>>>>>> 23c1335 (refactor(terraform): properly define ECS tasks with separate resource configurations)
             },
             {
                 "name": "_AIRFLOW_WWW_USER_EMAIL",
@@ -302,21 +295,16 @@ resource "aws_ecs_task_definition" "airflow" {
             },
             "secretOptions": []
         },
-<<<<<<< HEAD
         {
             "name": "airflow-scheduler",
             "image": ${var.image},
             "cpu": 0,
             "portMappings": [],
             "essential": true,
-=======
-        "healthCheck": {
->>>>>>> 23c1335 (refactor(terraform): properly define ECS tasks with separate resource configurations)
             "command": [
                 "CMD-SHELL",
                 "curl --fail http://localhost:8080/api/v2/monitor/health"
             ],
-<<<<<<< HEAD
             "environment": [
                 {
                     "name": "AIRFLOW__CORE__EXECUTION_API_SERVER_URL",
@@ -440,11 +428,7 @@ resource "aws_ecs_task_definition" "airflow" {
                 "options": {
                     "awslogs-group": "/ecs/${var.project_name}-${var.environment}-airflow",
                     "awslogs-create-group": "true",
-<<<<<<< HEAD
-                    "awslogs-region": ${data.aws_region.current.id},
-=======
                     "awslogs-region": "${data.aws_region.current.region}",
->>>>>>> 93bd191 (fix(ecs): enclose every variable inside quotes to prevent syntax and type errors)
                     "awslogs-stream-prefix": "ecs"
                 },
                 "secretOptions": []
@@ -598,11 +582,7 @@ resource "aws_ecs_task_definition" "airflow" {
                 "options": {
                     "awslogs-group": "/ecs/${var.project_name}-${var.environment}-airflow",
                     "awslogs-create-group": "true",
-<<<<<<< HEAD
-                    "awslogs-region": ${data.aws_region.current.id},
-=======
                     "awslogs-region": "${data.aws_region.current.region}",
->>>>>>> 93bd191 (fix(ecs): enclose every variable inside quotes to prevent syntax and type errors)
                     "awslogs-stream-prefix": "ecs"
                 },
                 "secretOptions": []
@@ -751,11 +731,7 @@ resource "aws_ecs_task_definition" "airflow" {
                 "options": {
                     "awslogs-group": "/ecs/${var.project_name}-${var.environment}-airflow",
                     "awslogs-create-group": "true",
-<<<<<<< HEAD
-                    "awslogs-region": ${data.aws_region.current.id},
-=======
                     "awslogs-region": "${data.aws_region.current.region}",
->>>>>>> 93bd191 (fix(ecs): enclose every variable inside quotes to prevent syntax and type errors)
                     "awslogs-stream-prefix": "ecs"
                 },
                 "secretOptions": []
@@ -785,11 +761,7 @@ resource "aws_ecs_task_definition" "airflow" {
                 "options": {
                     "awslogs-group": "/ecs/${var.project_name}-${var.environment}-airflow",
                     "awslogs-create-group": "true",
-<<<<<<< HEAD
-                    "awslogs-region": ${data.aws_region.current.id},
-=======
                     "awslogs-region": "${data.aws_region.current.region}",
->>>>>>> 93bd191 (fix(ecs): enclose every variable inside quotes to prevent syntax and type errors)
                     "awslogs-stream-prefix": "ecs"
                 },
                 "secretOptions": []
@@ -938,11 +910,7 @@ resource "aws_ecs_task_definition" "airflow" {
                 "options": {
                     "awslogs-group": "/ecs/${var.project_name}-${var.environment}-airflow",
                     "awslogs-create-group": "true",
-<<<<<<< HEAD
-                    "awslogs-region": ${data.aws_region.current.id},
-=======
                     "awslogs-region": "${data.aws_region.current.region}",
->>>>>>> 93bd191 (fix(ecs): enclose every variable inside quotes to prevent syntax and type errors)
                     "awslogs-stream-prefix": "ecs"
                 },
                 "secretOptions": []
@@ -1082,11 +1050,7 @@ resource "aws_ecs_task_definition" "airflow" {
                 "options": {
                     "awslogs-group": "/ecs/${var.project_name}-${var.environment}-airflow",
                     "awslogs-create-group": "true",
-<<<<<<< HEAD
-                    "awslogs-region": ${data.aws_region.current.id},
-=======
                     "awslogs-region": "${data.aws_region.current.region}",
->>>>>>> 93bd191 (fix(ecs): enclose every variable inside quotes to prevent syntax and type errors)
                     "awslogs-stream-prefix": "ecs"
                 },
                 "secretOptions": []
@@ -1107,14 +1071,6 @@ resource "aws_ecs_task_definition" "airflow" {
     "runtimePlatform": {
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
-=======
-            "interval": 30,
-            "timeout": 10,
-            "retries": 5,
-            "startPeriod": 30
-        },
-        "systemControls": []
->>>>>>> 23c1335 (refactor(terraform): properly define ECS tasks with separate resource configurations)
     },
     {
         "name": "airflow-scheduler",
