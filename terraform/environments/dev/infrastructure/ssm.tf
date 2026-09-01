@@ -53,13 +53,8 @@ resource "aws_ssm_parameter" "bucket" {
 }
 
 resource "aws_ssm_parameter" "alb_sg" {
-<<<<<<< HEAD
-  name = "/${var.project_name}/${var.environment}/networking/alb_sg"
-  type = "StringList"
-=======
   name  = "/${var.project_name}/${var.environment}/networking/alb_sg"
   type  = "String"
->>>>>>> 3d0989a (refactor(terraform): refine values and types)
   value = module.vpc.alb_sg
 }
 
