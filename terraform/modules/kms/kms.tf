@@ -36,7 +36,8 @@ resource "aws_kms_key" "app" {
           "kms:Get*",
           "kms:Delete*",
           "kms:ScheduleKeyDeletion",
-          "kms:CancelKeyDeletion"
+          "kms:CancelKeyDeletion",
+          "kms:TagResource"
         ],
         Resource = "*"
       },
@@ -55,7 +56,8 @@ resource "aws_kms_key" "app" {
           "kms:GenerateDataKeyWithoutPlaintext",
           "kms:CreateGrants",
           "kms:ListGrants",
-          "kms:RevokeGrant"
+          "kms:RevokeGrant",
+          "kms:TagResource"
         ],
         Resource = "*"
         Condition = {
