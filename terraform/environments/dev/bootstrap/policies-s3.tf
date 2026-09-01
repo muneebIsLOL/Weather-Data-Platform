@@ -1,4 +1,4 @@
-resource "aws_iam_role_policy" "terraform_s3_permissions" {
+resource "aws_iam_role_policy" "terraform_s3_policy" {
   name = "s3-policy"
   role = data.aws_iam_session_context.current.issuer_name
 
@@ -17,7 +17,10 @@ resource "aws_iam_role_policy" "terraform_s3_permissions" {
           "s3:ListObjects",
           "s3:GetObject*",
           "s3:ListBucket",
-          "s3:DeleteObject"
+          "s3:DeleteObject",
+          "s3:Get*",
+          "s3:PutEncryptionConfiguration",
+          "s3:PutBucket*"
         ]
         Resource = "*"
       },
