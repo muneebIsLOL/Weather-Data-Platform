@@ -67,7 +67,7 @@ jobs:
     with:
       head_sha: ${{ github.sha }}
       head_branch: ${{ github.ref_name }}
-      deploy_all: false
+      deploy_all: true
     secrets: inherit
     permissions:
       id-token: write
