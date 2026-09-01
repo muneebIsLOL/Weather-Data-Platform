@@ -32,7 +32,7 @@ module "vpc" {
     }
   }
 
-  external_cloudwatch_log_group_arn = data.aws_ssm_parameter.cloudwatch_role.arn
+  external_cloudwatch_log_group_arn = data.aws_ssm_parameter.cloudwatch_role.value
   external_flow_log_role_arn        = module.cloudwatch.log_group_arn
   depends_on                        = [module.cloudwatch]
 }
