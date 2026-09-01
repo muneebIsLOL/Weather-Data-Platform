@@ -88,7 +88,7 @@ resource "aws_iam_role_policy" "terraform_ecs_policy" {
         Action = [
           "ecs:CreateCluster",
           "ecs:DeleteCluster",
-          "ecs:DescribeCluster",
+          "ecs:DescribeClusters",
           "ecs:ListClusters",
           "ecs:UpdateCluster",
           "ecs:UpdateClusterSettings"
