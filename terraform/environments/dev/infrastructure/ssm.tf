@@ -59,20 +59,20 @@ resource "aws_ssm_parameter" "alb_sg" {
 }
 
 resource "aws_ssm_parameter" "ecs_sg" {
-  name = "/${var.project_name}/${var.environment}/networking/ecs_services_sg"
-  type = "String"
+  name  = "/${var.project_name}/${var.environment}/networking/ecs_services_sg"
+  type  = "String"
   value = module.vpc.ecs_sg
 }
 
 resource "aws_ssm_parameter" "vpc_id" {
-  name = "/${var.project_name}/${var.environment}/networking/vpc_id"
-  type = "String"
+  name  = "/${var.project_name}/${var.environment}/networking/vpc_id"
+  type  = "String"
   value = module.vpc.vpc_id
 }
 
 resource "aws_ssm_parameter" "cluster_id" {
-  name = "/${var.project_name}/${var.environment}/ecs/cluster_id"
-  type = "String"
+  name  = "/${var.project_name}/${var.environment}/ecs/cluster_id"
+  type  = "String"
   value = module.ecs_cluster.cluster_id
 }
 
