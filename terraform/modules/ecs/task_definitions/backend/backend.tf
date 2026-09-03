@@ -1,3 +1,5 @@
+data "aws_region" "current" {}
+
 resource "aws_ecs_task_definition" "backend" {
   family = "${var.project_name}-${var.environment}-backend"
 
@@ -5,7 +7,7 @@ resource "aws_ecs_task_definition" "backend" {
 [
     {
         "name": "backend-api",
-        "image": ${var.image},
+        "image": "${var.image}",
         "cpu": 0,
         "portMappings": [
             {
@@ -20,23 +22,31 @@ resource "aws_ecs_task_definition" "backend" {
         "environment": [
             {
                 "name": "APP_DB_HOST",
-                "value": ${var.app_db_host}
+                "value": "${var.app_db_host}"
             },
             {
                 "name": "APP_POSTGRES_PASSWORD",
-                "value": ${var.app_postgres_password}
+                "value": "${var.app_postgres_password}"
             },
             {
                 "name": "APP_DB_NAME",
-                "value": ${var.app_db_name}
+                "value": "${var.app_db_name}"
             },
             {
                 "name": "APP_POSTGRES_USER",
-                "value": ${var.app_postgres_user}
+                "value": "${var.app_postgres_user}"
             },
             {
                 "name": "APP_AUTH_ACCESS_TOKEN",
                 "value": "MySecureToken!"
+            },
+            {
+                "name": "CI",
+                "value": "false"
+            },
+            {
+                "name": "APP_DB_CERT_PATH",
+                "value": "/app/src/db/global-bundle.pem"
             }
         ],
         "mountPoints": [],
@@ -52,7 +62,7 @@ resource "aws_ecs_task_definition" "backend" {
             "options": {
                 "awslogs-group": "/ecs/${var.project_name}-${var.environment}-backend",
                 "awslogs-create-group": "true",
-                "awslogs-region": "ap-south-1",
+                "awslogs-region": "${data.aws_region.current.region}",
                 "awslogs-stream-prefix": "ecs"
             },
             "secretOptions": []
@@ -60,7 +70,7 @@ resource "aws_ecs_task_definition" "backend" {
         "healthCheck": {
             "command": [
                 "CMD-SHELL",
-                "curl -f http://127.0.0.1:8000/docs || >/dev/null"
+                "curl -f http://127.0.0.1:8000/health >/dev/null 2>&1"
             ],
             "interval": 30,
             "timeout": 5,
@@ -70,7 +80,7 @@ resource "aws_ecs_task_definition" "backend" {
     },
     {
         "name": "backend-db",
-        "image": ${var.image},
+        "image": "${var.image}",
         "cpu": 0,
         "portMappings": [],
         "essential": false,
@@ -82,19 +92,23 @@ resource "aws_ecs_task_definition" "backend" {
         "environment": [
             {
                 "name": "APP_DB_HOST",
-                "value": ${var.app_db_host}
+                "value": "${var.app_db_host}"
             },
             {
                 "name": "APP_POSTGRES_PASSWORD",
-                "value": ${var.app_postgres_password}
+                "value": "${var.app_postgres_password}"
             },
             {
                 "name": "APP_DB_NAME",
-                "value": ${var.app_db_name}
+                "value": "${var.app_db_name}"
             },
             {
                 "name": "APP_POSTGRES_USER",
-                "value": ${var.app_postgres_user}
+                "value": "${var.app_postgres_user}"
+            },
+            {
+                "name": "CI",
+                "value": "false"
             }
         ],
         "mountPoints": [],
@@ -104,28 +118,25 @@ resource "aws_ecs_task_definition" "backend" {
             "options": {
                 "awslogs-group": "/ecs/${var.project_name}-${var.environment}-backend",
                 "awslogs-create-group": "true",
-                "awslogs-region": "ap-south-1",
+                "awslogs-region": "${data.aws_region.current.region}",
                 "awslogs-stream-prefix": "ecs"
             },
             "secretOptions": []
         },
         "systemControls": []
-    },
-    "taskRoleArn": ${var.task_role_arn},
-    "executionRoleArn": ${var.execution_role_arn},
-    "networkMode": "awsvpc",
-    "volumes": [],
-    "placementConstraints": [],
-    "requiresCompatibilities": [
-        "FARGATE"
-    ],
-    "cpu": "1024",
-    "memory": "4096",
-    "runtimePlatform": {
-        "cpuArchitecture": "X86_64",
-        "operatingSystemFamily": "LINUX"
-    },
-    "enableFaultInjection": false
+    }
 ]
     TASK_DEFINITION
+
+  task_role_arn      = var.task_role_arn
+  execution_role_arn = var.execution_role_arn
+  network_mode       = "awsvpc"
+  cpu                = 1024
+  memory             = 4096
+  runtime_platform {
+    cpu_architecture        = "X86_64"
+    operating_system_family = "LINUX"
+  }
+  enable_fault_injection   = false
+  requires_compatibilities = ["FARGATE"]
 }

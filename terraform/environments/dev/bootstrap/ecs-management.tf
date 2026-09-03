@@ -88,7 +88,7 @@ resource "aws_iam_role_policy" "terraform_ecs_policy" {
         Action = [
           "ecs:CreateCluster",
           "ecs:DeleteCluster",
-          "ecs:DescribeCluster",
+          "ecs:DescribeClusters",
           "ecs:ListClusters",
           "ecs:UpdateCluster",
           "ecs:UpdateClusterSettings"
@@ -115,6 +115,20 @@ resource "aws_iam_role_policy" "terraform_ecs_policy" {
           "ecs:UntagResource",
           "ecs:ListTagsForResource"
         ]
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowServiceManagement"
+        Effect = "Allow"
+        Action = [
+          "ecs:CreateService",
+          "ecs:DeleteService",
+          "ecs:ListServices",
+          "ecs:UpdateService",
+          "ecs:DescribeService*",
+          "ecs:StopServiceDeployment"
+        ]
+
         Resource = "*"
       }
     ]

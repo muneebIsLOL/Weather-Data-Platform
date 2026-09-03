@@ -20,4 +20,4 @@ FROM nginx:alpine
 COPY ./frontend/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/frontend/dist /usr/share/nginx/html
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/bin/sh", "-c", "echo \"window.__env__ = { VITE_HOST_URL: '${VITE_HOST_URL}' };\" > /usr/share/nginx/html/config.js && nginx -g 'daemon off;'"]

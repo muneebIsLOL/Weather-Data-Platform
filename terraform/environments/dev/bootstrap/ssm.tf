@@ -1,7 +1,7 @@
 resource "aws_ssm_parameter" "cloudwatch_role" {
   name  = "/${var.project_name}/${var.environment}/iam/cloudwatch_role"
   type  = "String"
-  value = aws_iam_role.cloudwatch_role.id
+  value = aws_iam_role.cloudwatch_role.arn
 
   depends_on = [aws_iam_role_policy.terraform_ssm_policy]
 }

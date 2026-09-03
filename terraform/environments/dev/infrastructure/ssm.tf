@@ -51,3 +51,39 @@ resource "aws_ssm_parameter" "bucket" {
   type  = "String"
   value = module.s3.bucket
 }
+
+resource "aws_ssm_parameter" "alb_sg" {
+  name  = "/${var.project_name}/${var.environment}/networking/alb_sg"
+  type  = "String"
+  value = module.vpc.alb_sg
+}
+
+resource "aws_ssm_parameter" "ecs_sg" {
+  name  = "/${var.project_name}/${var.environment}/networking/ecs_services_sg"
+  type  = "String"
+  value = module.vpc.ecs_sg
+}
+
+resource "aws_ssm_parameter" "vpc_id" {
+  name  = "/${var.project_name}/${var.environment}/networking/vpc_id"
+  type  = "String"
+  value = module.vpc.vpc_id
+}
+
+resource "aws_ssm_parameter" "cluster_id" {
+  name  = "/${var.project_name}/${var.environment}/ecs/cluster_id"
+  type  = "String"
+  value = module.ecs_cluster.cluster_id
+}
+
+resource "aws_ssm_parameter" "public_subnets" {
+  name  = "/${var.project_name}/${var.environment}/networking/public_subnets"
+  type  = "StringList"
+  value = join(",", module.vpc.public_subnets)
+}
+
+resource "aws_ssm_parameter" "private_subnets" {
+  name  = "/${var.project_name}/${var.environment}/networking/private_subnets"
+  type  = "StringList"
+  value = join(",", module.vpc.private_subnets)
+}

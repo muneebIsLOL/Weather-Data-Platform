@@ -32,7 +32,7 @@ module "vpc" {
     }
   }
 
-  external_cloudwatch_log_group_arn = data.aws_ssm_parameter.cloudwatch_role.arn
+  external_cloudwatch_log_group_arn = data.aws_ssm_parameter.cloudwatch_role.value
   external_flow_log_role_arn        = module.cloudwatch.log_group_arn
   depends_on                        = [module.cloudwatch]
 }
@@ -41,7 +41,7 @@ module "db" {
   source       = "../../../modules/databases"
   project_name = var.project_name
   environment  = var.environment
-  subnet_ids   = module.vpc.subnet_ids
+  subnet_ids   = module.vpc.private_subnets
   sg_ids       = [module.vpc.postgres_sg_id]
   depends_on   = [module.vpc]
 }
