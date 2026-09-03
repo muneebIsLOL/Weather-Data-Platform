@@ -45,7 +45,7 @@ resource "aws_ecs_task_definition" "backend" {
                 "value": "false"
             },
             {
-                "name": "APP_DB_CERT_PATH"
+                "name": "APP_DB_CERT_PATH",
                 "value": "/app/src/db/global-bundle.pem"
             }
         ],
