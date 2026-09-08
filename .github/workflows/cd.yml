@@ -34,9 +34,13 @@ jobs:
           filters: |
             airflow:
               - 'airflow/**'
+              - 'backend/src/ELT**'
+              - 'backend/src/db**'
               - 'requirements/**'
             backend:
-              - 'backend/**'
+              - 'backend/src/db**'
+              - 'backend/src/api**'
+              - 'backend/*'
               - 'requirements/**'
             frontend:
               - 'frontend/**'
@@ -58,7 +62,7 @@ jobs:
 
   deploy-dev:
     needs: determine-apps
-    if: needs.determine-apps.outputs.apps != '[]' && needs.determine-apps.outputs.apps != '' && (inputs.head_branch == 'aws-migration' || startsWith(inputs.head_branch, 'v'))
+    if: needs.determine-apps.outputs.apps != '[]' && needs.determine-apps.outputs.apps != '' && contains(inputs.head_branch, 'dev')
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -78,7 +82,7 @@ jobs:
           if [ "$RAW_TAG" = "none" ]; then
             FINAL_TAG=$(echo "${{ inputs.head_sha }}" | cut -c1-7)
           else
-            FINAL_TAG=$(echo "$RAW_TAG" | sed 's/^v//')
+            FINAL_TAG=$(echo "${RAW_TAG#v}")
           fi
           echo "tag=$FINAL_TAG" >> $GITHUB_OUTPUT
 
@@ -108,7 +112,7 @@ jobs:
 
   deploy-prod:
     needs: determine-apps
-    if: needs.determine-apps.outputs.apps != '[]' && needs.determine-apps.outputs.apps != '' && (inputs.head_branch == 'main' || startsWith(inputs.head_branch, 'v'))
+    if: (needs.determine-apps.outputs.apps != '[]' && needs.determine-apps.outputs.apps != '') && contains(inputs.head_branch, 'prod')
     runs-on: ubuntu-latest
     environment: production
     strategy:
@@ -129,7 +133,7 @@ jobs:
           if [ "$RAW_TAG" = "none" ]; then
             FINAL_TAG=$(echo "${{ inputs.head_sha }}" | cut -c1-7)
           else
-            FINAL_TAG=$(echo "$RAW_TAG" | sed 's/^v//')
+            FINAL_TAG=$(echo "${RAW_TAG#v}")
           fi
           echo "tag=$FINAL_TAG" >> $GITHUB_OUTPUT
 

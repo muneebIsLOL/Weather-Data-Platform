@@ -3,7 +3,8 @@ name: CI - Code Validation
 on:
   push:
     tags:
-      - "v*"
+      - "v*-prod"
+      - "v*-dev"
   pull_request:
     paths:
       - "backend/src/**"
@@ -63,7 +64,7 @@ jobs:
   trigger-cd:
     if: github.event_name == 'push'
     needs: unit-tests
-    uses: ./.github/workflows/push-to-ecr.yml 
+    uses: ./.github/workflows/cd.yml
     with:
       head_sha: ${{ github.sha }}
       head_branch: ${{ github.ref_name }}
