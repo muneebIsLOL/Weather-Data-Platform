@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.jsx'
+import App from './App.js'
 import { HealthCheck } from "./routes/health/Health.jsx"
 import React from "react";
 import ReactDOM from "react-dom/client";
