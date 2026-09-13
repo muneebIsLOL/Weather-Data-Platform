@@ -1,10 +1,9 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBars, faBarsStaggered, faLocationDot, faXmark } from "@fortawesome/free-solid-svg-icons"
+import { faBarsStaggered, faLocationDot, faXmark } from "@fortawesome/free-solid-svg-icons"
 import "./App.css"
-import Settings from '../settings/Settings'
 import { useState } from 'react'
 
-const Navbar = ({ onClick, icon }) => {
+const Navbar = ({ onClick, icon }: {onClick: () => void, icon: boolean}) => {
     const [animating, setAnimating] = useState(false);
 
     const handleClick = () => {
