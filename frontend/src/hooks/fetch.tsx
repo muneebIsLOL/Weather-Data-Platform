@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react"
 
-function useFetch(endpoint) {
-    const [data, setData] = useState(null)
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
-    const host = window.__env__.VITE_API_URL;
+function useFetch<T>(endpoint: string) {
+    const [data, setData] = useState<T | null>(null)
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<null | string>(null);
+    const host = window.__env__?.VITE_HOST_URL;
 
     useEffect(() => {
         setLoading(true);
@@ -15,7 +15,7 @@ function useFetch(endpoint) {
         })
             .then(res => {
                 if (!res.ok) {
-                    throw new Error("API limit reached or request failed");
+                    throw new Error("Request Encountered an Error!");
                 }
                 return res.json();
             })
@@ -29,7 +29,7 @@ function useFetch(endpoint) {
             });
     }, []);
 
-    return [data, loading, error]
+    return [data, loading, error] as const
 }
 
 export default useFetch;
