@@ -4,13 +4,18 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useState } from "react";
 import { useTheme } from "../../hooks/theme"
 import capitalizeFirstLetter from "../../utils/text"
+import type { Unit } from "../../types";
 
+interface SettingsProps {
+    className: string
+    unit: Unit
+    setUnits: (value: Unit) => void
+}
 
-
-const Settings = ({ className, unit, setUnits }) => {
-    const [openItem, setOpenItem] = useState(null);
+const Settings = ({ className, unit, setUnits }: SettingsProps) => {
+    const [openItem, setOpenItem] = useState<number | null>(null);
     const { themeMode, setThemeMode } = useTheme();
-    const toggleItem = (index) => {
+    const toggleItem = (index: number) => {
         setOpenItem(current =>
             current === index ? null : index
         );

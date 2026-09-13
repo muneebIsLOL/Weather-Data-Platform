@@ -10,7 +10,7 @@ export function useTheme() {
   useEffect(() => {
     const root = document.documentElement;
 
-    const determineActiveTheme = (mode) => {
+    const determineActiveTheme = (mode: string) => {
       if (mode === "system") {
         return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
       }
@@ -23,7 +23,7 @@ export function useTheme() {
     if (currentTheme === "light") {
       root.setAttribute("theme", "light");
     } else {
-      root.removeAttribute("theme"); 
+      root.removeAttribute("theme");
     }
 
     localStorage.setItem("theme-mode", themeMode);
@@ -33,12 +33,12 @@ export function useTheme() {
     if (themeMode !== "system") return;
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: light)");
-    
-    const handleSystemChange = (e) => {
+
+    const handleSystemChange = (e: MediaQueryListEvent) => {
       const root = document.documentElement;
       const newTheme = e.matches ? "light" : "dark";
       setActiveTheme(newTheme);
-      
+
       if (newTheme === "light") {
         root.setAttribute("theme", "light");
       } else {

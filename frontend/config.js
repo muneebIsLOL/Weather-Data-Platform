@@ -1,4 +1,4 @@
-export const API_URL = 
-  (typeof window !== 'undefined' && window.__env__?.VITE_API_URL) || 
-  import.meta.env.VITE_API_URL || 
-  'localhost';
+export const API_URL =
+    window.__env__?.VITE_HOST_URL ||
+    import.meta.env.VITE_HOST_URL ||
+    "localhost";

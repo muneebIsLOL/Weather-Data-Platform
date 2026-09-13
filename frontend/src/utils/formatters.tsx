@@ -1,4 +1,8 @@
-const formatters = {
+import type { Unit } from "../types";
+
+type Formatters = "temperature" | "wind_speed" | "pressure"
+
+const formatters: Record<Formatters, (value: number, unit?: Unit) => string | number> = {
     temperature: (value, unit) =>
         unit === "metric"
             ? Math.round(value)
@@ -9,7 +13,7 @@ const formatters = {
             ? `${Math.round(value)} km/h`
             : `${Math.round(value / 1.60934)} mph`,
 
-    pressure: value => `${Math.round(value)} hPa`,
+    pressure: (value): string => `${Math.round(value)} hPa`,
 };
 
 export default formatters;

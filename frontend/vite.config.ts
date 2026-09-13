@@ -10,10 +10,9 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     server: {
-      allowedHosts: [
-        // Ensure this variable is defined in your .env file
-        env.VITE_HOST_URL 
-      ]
+      allowedHosts: env.VITE_HOST_URL
+        ? [env.VITE_HOST_URL]
+        : [],
     }
   }
 })
