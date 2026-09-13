@@ -1,4 +1,4 @@
-function capitalizeFirstLetter(str) {
+function capitalizeFirstLetter(str: string) {
     if (!str) return '';
 
     return str
