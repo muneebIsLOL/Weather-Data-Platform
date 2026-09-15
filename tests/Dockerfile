@@ -14,10 +14,10 @@ COPY ./backend/src/api ./src/api
 
 COPY ./backend/src/db/connection.py ./src/connection.py
 
-COPY ./test-infra/test_db_init.sh ./test_db_init.sh
+COPY ./tests/scripts/init_test_db.sh ./init_test_db.sh
 
-RUN chmod +x ./test_db_init.sh
+RUN chmod +x ./init_test_db.sh
 
-ENTRYPOINT ["./test_db_init.sh"]
+ENTRYPOINT ["./init_test_db.sh"]
 
 CMD ["python", "-m", "pytest"]
