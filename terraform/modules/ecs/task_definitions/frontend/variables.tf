@@ -21,3 +21,7 @@ variable "execution_role_arn" {
 variable "vite_host_url" {
   type = string
 }
+
+variable "api_token" {
+  type = string
+}

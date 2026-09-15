@@ -59,6 +59,7 @@ services:
       - "127.0.0.1:5173:5173"
     environment:
       VITE_HOST_URL: ${VITE_HOST_URL:-localhost}
+      APP_AUTH_ACCESS_TOKEN: ${APP_AUTH_ACCESS_TOKEN:-MySecureToken!}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://127.0.0.1:5173/health >/dev/null 2>&1"]
       interval: 15s

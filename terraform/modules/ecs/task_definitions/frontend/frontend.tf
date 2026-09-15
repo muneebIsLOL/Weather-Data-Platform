@@ -23,6 +23,10 @@ resource "aws_ecs_task_definition" "frontend" {
             {
                 "name": "VITE_HOST_URL",
                 "value": "${var.vite_host_url}"
+            },
+            {
+                "name": "APP_AUTH_ACCESS_TOKEN",
+                "value": "${var.api_token}"
             }
         ],
         "environmentFiles": [],
