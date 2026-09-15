@@ -43,6 +43,7 @@ module "ecs_frontend_task_def" {
   task_role_arn      = data.aws_ssm_parameter.ecs_task_role_arn.value
   execution_role_arn = data.aws_ssm_parameter.ecs_task_execution_role_arn.value
   vite_host_url      = module.alb.alb_dns
+  api_token          = module.ecs_backend_task_def.api_token
 }
 
 module "ecs_services" {
