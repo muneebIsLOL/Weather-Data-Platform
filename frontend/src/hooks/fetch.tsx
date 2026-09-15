@@ -4,14 +4,15 @@ function useFetch<T>(endpoint: string) {
     const [data, setData] = useState<T | null>(null)
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<null | string>(null);
-    const host = window.__env__?.VITE_HOST_URL;
+    const host = window.__env__?.VITE_HOST_URL || "localhost";
+    const api_token = window.__env__?.API_TOKEN || "MySecureToken!"
 
     useEffect(() => {
         setLoading(true);
         setError(null);
 
         fetch(`http://${host}:8000/${endpoint}`, {
-            headers: { token: "Cubecraft" }
+            headers: { token: api_token as string}
         })
             .then(res => {
                 if (!res.ok) {
