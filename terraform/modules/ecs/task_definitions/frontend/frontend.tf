@@ -25,7 +25,7 @@ resource "aws_ecs_task_definition" "frontend" {
                 "value": "${var.vite_host_url}"
             },
             {
-                "name": "API_TOKEN",
+                "name": "APP_AUTH_ACCESS_TOKEN",
                 "value": "${var.api_token}"
             }
         ],
