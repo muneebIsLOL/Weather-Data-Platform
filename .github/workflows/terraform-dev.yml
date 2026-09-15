@@ -3,12 +3,12 @@ name: Terraform CI/CD
 on:
   push:
     branches:
-      - "aws-migration"
+      - "main"
     paths:
       - "terraform/environments/dev/**"
   pull_request:
     branches:
-      - "aws-migration"
+      - "main"
     paths:
       - "terraform/environments/dev/**"
 
@@ -66,6 +66,7 @@ jobs:
         run: terraform plan -input=false -out=tfplan
 
       - name: Terraform Apply
+        if: github.event_name == 'push'
         run: terraform apply -input=false -auto-approve
 
       - name: Make Logs Folder
@@ -117,6 +118,7 @@ jobs:
         run: terraform plan -input=false -out=tfplan
 
       - name: Terraform Apply
+        if: github.event_name == 'push'
         run: terraform apply -input=false -auto-approve
 
       - name: Make Logs Folder
@@ -167,6 +169,7 @@ jobs:
         run: terraform plan -input=false -out=tfplan
 
       - name: Terraform Apply
+        if: github.event_name == 'push'
         run: terraform apply -input=false -auto-approve
 
       - name: Make Logs Folder
