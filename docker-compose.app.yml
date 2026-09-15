@@ -76,7 +76,7 @@ services:
       - tests-dep
     build:
       context: .
-      dockerfile: test-infra/Dockerfile
+      dockerfile: tests/Dockerfile
     environment:
       APP_POSTGRES_USER: ${APP_POSTGRES_USER:-postgres}
       APP_POSTGRES_PASSWORD: ${APP_POSTGRES_PASSWORD:-MyPassword!}
