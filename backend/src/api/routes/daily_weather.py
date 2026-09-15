@@ -11,7 +11,7 @@ router = APIRouter(prefix="/daily")
 @router.get("/today", response_model=List[DailyConditionsResponse], tags=["today"])
 def today_weather():
     try:
-        engine = get_engine("/app/src/db/global-bundle.pem")
+        engine = get_engine()
         response = get_today(engine)
         return response
 
@@ -28,7 +28,7 @@ def today_weather():
 )
 def daily_weather_forecast():
     try:
-        engine = get_engine("/app/src/db/global-bundle.pem")
+        engine = get_engine()
         response = get_daily_forecast(engine)
         return response
 

@@ -14,7 +14,7 @@ router = APIRouter()
 )
 def current_weather():
     try:
-        engine = get_engine("/app/src/db/global-bundle.pem")
+        engine = get_engine()
         response = get_current(engine)
         return response
 

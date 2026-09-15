@@ -1,5 +1,6 @@
 import httpx
 from urllib.error import HTTPError
+from sqlalchemy.exc import DatabaseError
 
 def extract_data():
     try:
@@ -53,7 +54,7 @@ def extract_data():
         }
 
         if any(
-            x is None for x in [current_conditions, hourly_conditions, daily_conditions]
+            x is None for x in [current_conditions, hourly_conditions, daily_conditions, weather_metadata]
         ):
             raise ValueError("Missing Critical Fields.")
 
@@ -73,4 +74,8 @@ def extract_data():
     
     except HTTPError as e:
         print("Network error!!")
+        raise e
+
+    except DatabaseError as e:
+        print("Database Error!!")
         raise e

@@ -13,3 +13,5 @@ dist
 dist-ssr
 *.local
 README.md
+
+*.env
