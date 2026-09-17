@@ -1,0 +1,162 @@
+name: CD - Code Deployment
+
+on:
+  workflow_call:
+    inputs:
+      head_sha:
+        required: true
+        type: string
+      head_branch:
+        required: true
+        type: string
+      deploy_all:
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      changed_apps: ${{ steps.filter.outputs.changes }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.head_sha }}
+          fetch-depth: 0
+
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            airflow:
+              - 'airflow/**'
+              - 'backend/src/ELT**'
+              - 'backend/src/db**'
+              - 'requirements/**'
+            backend:
+              - 'backend/src/db**'
+              - 'backend/src/api**'
+              - 'backend/*'
+              - 'requirements/**'
+            frontend:
+              - 'frontend/**'
+
+  determine-apps:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    outputs:
+      apps: ${{ steps.apps.outputs.apps }}
+    steps:
+      - name: Determine apps
+        id: apps
+        run: |
+          if [ "${{ inputs.deploy_all }}" = "true" ]; then
+            echo 'apps=["backend","frontend","airflow"]' >> "$GITHUB_OUTPUT"
+          else
+            echo 'apps=${{ needs.detect-changes.outputs.changed_apps }}' >> "$GITHUB_OUTPUT"
+          fi
+
+  deploy-dev:
+    needs: determine-apps
+    if: needs.determine-apps.outputs.apps != '[]' && needs.determine-apps.outputs.apps != '' && contains(inputs.head_branch, 'dev')
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJson(needs.determine-apps.outputs.apps) }}
+    steps:
+      - name: Check out Repo
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.head_sha }}
+          fetch-depth: 0
+
+      - name: Extract Tag or Fallback to Short SHA
+        id: get_tag
+        run: |
+          RAW_TAG=$(git describe --tags --exact-match HEAD 2>/dev/null || echo "none")
+          if [ "$RAW_TAG" = "none" ]; then
+            FINAL_TAG=$(echo "${{ inputs.head_sha }}" | cut -c1-7)
+          else
+            FINAL_TAG=$(echo "${RAW_TAG#v}")
+          fi
+          echo "tag=$FINAL_TAG" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: "arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformDevRole"
+          aws-region: "ap-south-1"
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set Up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push to ECR (Dev)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./${{ matrix.app }}/Dockerfile
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/weather-platform-dev/${{ matrix.app }}:${{ steps.get_tag.outputs.tag }}
+
+  deploy-prod:
+    needs: determine-apps
+    if: (needs.determine-apps.outputs.apps != '[]' && needs.determine-apps.outputs.apps != '') && contains(inputs.head_branch, 'prod')
+    runs-on: ubuntu-latest
+    environment: production
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJson(needs.determine-apps.outputs.apps) }}
+    steps:
+      - name: Check out Repo
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.head_sha }}
+          fetch-depth: 0
+
+      - name: Extract Tag or Fallback to Short SHA
+        id: get_tag
+        run: |
+          RAW_TAG=$(git describe --tags --exact-match HEAD 2>/dev/null || echo "none")
+          if [ "$RAW_TAG" = "none" ]; then
+            FINAL_TAG=$(echo "${{ inputs.head_sha }}" | cut -c1-7)
+          else
+            FINAL_TAG=$(echo "${RAW_TAG#v}")
+          fi
+          echo "tag=$FINAL_TAG" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: "arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/TerraformProdRole"
+          aws-region: "ap-south-1"
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set Up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push to ECR (Prod)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./${{ matrix.app }}/Dockerfile
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/weather-platform-prod/${{ matrix.app }}:${{ steps.get_tag.outputs.tag }}
