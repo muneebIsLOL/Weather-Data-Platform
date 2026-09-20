@@ -4,7 +4,7 @@
 A production-style, containerized data engineering platform built with Apache Airflow, FastAPI, PostgreSQL, and Docker. The platform automates weather data ingestion, transformation, validation, and storage through ELT pipelines, while exposing processed data through Fastapi APIs and an interactive frontend dashboard.
 Hence, providing both the local and online (AWS) deployment. 
 
-<br>
+<p></p>
 
 <p align="center">
 <a href="https://github.com/muneebIsLOL/Weather-Data-Platform/releases"><img src="https://img.shields.io/github/v/release/muneebIsLOL/Weather-Data-Platform" alt="GitHub release"></a>
@@ -30,7 +30,7 @@ Hence, providing both the local and online (AWS) deployment.
 
 ## Quick Start
 
-> [!Note] (Optional) Configure Environment
+> [!Note]
 > - After cloning the repo, grab the variables from `.env.example`.
 > - Make an environment file and name it `.env.production`.
 > - Paste the variables from `.env.example` and tailor it according to your needs.
@@ -54,6 +54,8 @@ sudo usermod -aG docker $USER
 newgrp docker
 ```
 
+<p></p>
+
 **2. macOS (Intel / Apple Silicon)**
 
 **Download the Installer**
@@ -73,6 +75,8 @@ Go to the official download page and select the version that matches your Mac's 
 **Complete Setup**
 - macOS will ask you to authorize Docker Desktop with your system password. This is required to install its networking and privileged helper tools.
 - Follow the on-screen onboarding steps and accept the service agreement.
+
+<p></p>
 
 **3. Windows**
 
@@ -95,10 +99,11 @@ Docker Desktop on Windows performs best using the Windows Subsystem for Linux (W
 - After your PC restarts, launch Docker Desktop from your Start Menu.
 - Accept the Docker Subscription Service Agreement.
 
-<br>
+<p></p>
+
 Once Docker Desktop is running (you will see a solid green whale icon in your menu bar or system tray), open your terminal (Terminal on Mac, or PowerShell / Command Prompt on Windows) and verify that both Docker and Compose are ready:
 
-<br>
+<p></p>
 
 ```bash
 docker --version
