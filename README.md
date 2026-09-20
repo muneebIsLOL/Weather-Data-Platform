@@ -30,6 +30,7 @@ Hence, providing both the local and online (AWS) deployment.
 
 ## Quick Start
 
+**Optional**
 > [!Note]
 > - After cloning the repo, grab the variables from `.env.example`.
 > - Make an environment file and name it `.env.production`.
