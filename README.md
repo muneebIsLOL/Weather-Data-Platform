@@ -1,7 +1,12 @@
-# Weather Data Platform
-
-## Overview
+<div align="center">
+  <h1>Weather Data Platform</h1>
+</div>
 A production-style, containerized data engineering platform built with Apache Airflow, FastAPI, PostgreSQL, and Docker. The platform automates weather data ingestion, transformation, validation, and storage through ELT pipelines, while exposing processed data through Fastapi APIs and an interactive frontend dashboard.
+Hence, providing both the local and online (AWS) deployment. 
+
+<div style="display:flex; width:100%; gap:5px; margin:10px 0;">
+  <img width="50%" src="images/desktop/light.png"><img width="50%" src="images/desktop/dark.png">
+</div>
 
 ## Features
 - Automatically extracts weather from the `Open-Meteo` api.
@@ -14,37 +19,6 @@ A production-style, containerized data engineering platform built with Apache Ai
 - Supports current, hourly, and daily weather forecasts.
 - Maintains local backups of extracted datasets.
 - Runs as a fully containerized application for consistent deployment.
-
-## Core Stack & Tools
-### Frontend
-- React
-- Vite
-- Vanilla CSS
-
-### Backend
-- FastAPI
-- Pydantic
-
-### Database
-- PostgreSQL
-- SQLAlchemy
-
-### Data Engineering
-- Apache Airflow
-- ELT Pipeline
-
-### Data Source
-- Open-Meteo API
-
-### Containerization
-- Docker
-- Docker Compose
-
-### Testing
-- Pytest
-
-### CI/CD
-- GitHub Actions
 
 ## Step-by-Step Setup
 
