@@ -137,7 +137,7 @@ cd Weather-Data-Platform
 ./run.sh
 ```
 
-#### Access the Application (Frontend)
+#### Access the Application
 - **Frontend (GUI):** `localhost:5173` 
 - **Backend (API):** `localhost:8000` 
 - **Airflow (Orchestrator):** 
