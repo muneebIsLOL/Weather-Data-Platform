@@ -54,15 +54,16 @@ interface CurrentTempProps {
 const CurrentTemp = ({ data, error, loading, unit }: CurrentTempProps) => {
   return (
     <>
-      {loading && <p>Loading...</p>}
-
-      {error && <p>{error}</p>}
-
-      {!loading && !error && data && (
-        <h1 className="temperature">
-          {formatters.temperature(Math.round(data?.temperature), unit)}°
-        </h1>
-      )}
+      {
+        loading ? <p>Loading...</p> : (
+          !loading && !error && data ?
+            <h1 className="temperature">
+              {formatters.temperature(Math.round(data.temperature), unit)}°
+            </h1>
+            :
+            <h1 className="temperature">--/</h1>
+        )
+      }
     </>
   );
 }
@@ -111,24 +112,24 @@ const App = () => {
 
   return (
     <>
-      {
-        !loading && !error && data && (
-          <>
-            <main className="main-weather">
-              <Navbar onClick={() => setOpenStatus(!openStatus)} icon={openStatus} />
-              <section className="current-conditions">
-                <div className="basic-metrics">
-                  <CurrentTemp data={data} error={error} loading={loading} unit={unit} />
-                  <div className="feels-wrapper">
-                    <h3 className="feels-like">{!loading && !error && data && data.feels_like}</h3>
-                  </div>
-                </div>
-              </section>
-              <Card data={data} unit={unit} />
-            </main>
-            <Settings className={openStatus ? "" : "hide"} unit={unit} setUnits={setUnits} />
-          </>
-        )}
+
+      <main className="main-weather">
+        <Navbar onClick={() => setOpenStatus(!openStatus)} icon={openStatus} />
+        <section className="current-conditions">
+          <div className="basic-metrics">
+            <CurrentTemp data={data} error={error} loading={loading} unit={unit} />
+            <div className="feels-wrapper">
+              <h3 className="feels-like">
+                {!loading && !error && data
+                  ? data.feels_like
+                  : "--"}
+              </h3>
+            </div>
+          </div>
+        </section>
+        <Card data={data} error={error} loading={loading} unit={unit} />
+      </main>
+      <Settings className={openStatus ? "" : "hide"} unit={unit} setUnits={setUnits} />
     </>
   )
 }

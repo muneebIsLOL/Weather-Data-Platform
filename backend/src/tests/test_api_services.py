@@ -1,5 +1,5 @@
 import pytest
-from src.connection import get_engine
+from src.db.connection import get_engine
 
 def test_hourly_weather_service():
     from src.api.services.weather_service import get_hourly

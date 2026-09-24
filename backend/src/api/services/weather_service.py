@@ -23,8 +23,8 @@ def get_current(engine: Engine):
     )
 
     if hourly.empty or current.empty:
-        raise ValueError()
-    
+        raise ValueError("Data not found. Please try again in next 10-15 minutes.")
+
     current["time"] = pd.to_datetime(current["time"]).dt.round("h")
     hourly["time"] = pd.to_datetime(hourly["time"])
 
@@ -58,7 +58,8 @@ def get_hourly(engine: Engine):
     hourly = hourly.drop(columns="id")
     hourly = hourly[pd.to_datetime(hourly["time"]).dt.date == now]
     if hourly.empty:
-        raise ValueError()
+        raise ValueError("Data not found. Please try again in next 10-15 minutes.")
+
     hourly["time"] = hourly["time"].dt.strftime("%H:%M")
     sunrise = (
         pd.to_datetime(today["sunrise"])
@@ -87,14 +88,11 @@ def get_today(engine: Engine):
     today_weather = daily[pd.to_datetime(daily["time"]).dt.date == now]
     today_weather = today_weather.drop(columns="id")
     if today_weather.empty:
-        raise ValueError()
+        raise ValueError("Data not found. Please try again in next 10-15 minutes.")
 
     for col in ["time", "sunrise", "sunset"]:
         today_weather[col] = pd.to_datetime(today_weather[col])
-        today_weather[col] = (
-            today_weather[col]
-            .dt.strftime("%H:%M")
-        )
+        today_weather[col] = today_weather[col].dt.strftime("%H:%M")
 
     return today_weather.to_dict(orient="records")
 
@@ -105,7 +103,7 @@ def get_daily_forecast(engine: Engine):
     forecast = daily[pd.to_datetime(daily["time"]).dt.date >= (now - timedelta(days=1))]
 
     if forecast.empty:
-        raise ValueError()
+        raise ValueError("Data not found. Please try again in next 10-15 minutes.")
 
     forecast = forecast.drop(columns="id")
     forecast["time"] = forecast["time"].dt.day_name()

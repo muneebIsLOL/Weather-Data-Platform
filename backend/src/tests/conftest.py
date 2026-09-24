@@ -1,7 +1,7 @@
 from sqlalchemy import text
 import pytest
 from datetime import datetime, timedelta
-from src.connection import get_engine
+from src.db.connection import get_engine
 
 
 @pytest.fixture(scope="module")

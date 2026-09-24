@@ -88,58 +88,58 @@ const HourlyItem = ({ unit }: { unit: Unit }) => {
     const [data, loading, error] = useFetch<HourlyWeather[]>("hourly_weather")
     return (
         <>
+            {loading && <p> Loading...</p>}
+            {error && <p style={{ color: "red" }} >{error}</p>}
             {
-                loading ? <p style={{ color: "black" }
-                } > Loading...</p > :
-                    !loading && !error && data ?
-                        (
-                            <div className="hourly-conditions conditions-container">
+                !loading && !error && Array.isArray(data) &&
+                (
+                    <div className="hourly-conditions conditions-container">
 
-                                <div className="hourly-item">
-                                    {data.map((hour) => (
-                                        <div className="item">
-                                            <FontAwesomeIcon icon={getFeelsLikeIcon(hour.feels_like, hour.is_day)} className="feels-like-icon" />
-                                            <p className="time">{hour.time}</p>
-                                            <h3>{formatters.temperature(Math.round(hour.temperature_2m), unit)}°</h3>
-                                        </div>
-                                    ))}
+                        <div className="hourly-item">
+                            {data.map((hour) => (
+                                <div className="item">
+                                    <FontAwesomeIcon icon={getFeelsLikeIcon(hour.feels_like, hour.is_day)} className="feels-like-icon" />
+                                    <p className="time">{hour.time}</p>
+                                    <h3>{formatters.temperature(Math.round(hour.temperature_2m), unit)}°</h3>
                                 </div>
-                                <div className="hourly-chart">
-                                    <LineChart
-                                        data={data?.map(hour => ({
-                                            time: hour.time,
-                                            temp: hour.temperature_2m
-                                        }))}
-                                        width={data?.length * 110}
-                                        height={100}
-                                        margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
-                                    >
-                                        <XAxis dataKey="time"
-                                            tick={false}
-                                            axisLine={false}
-                                            hide
-                                        />
-                                        <YAxis
-                                            unit="°C"
-                                            axisLine={false}
-                                            tick={false}
-                                            hide
-                                            domain={["dataMin - 2", "dataMax + 2"]} />
-                                        <defs>
-                                            <linearGradient id="tempGradient" x1="0" y1="1" x2="0" y2="0">
-                                                <stop offset="0%" stopColor="#ccc" />
-                                                <stop offset="100%" stopColor="#ffd54a" />
-                                            </linearGradient>
-                                        </defs>
-                                        <Line
-                                            type="monotone"
-                                            dataKey="temp"
-                                            stroke="url(#tempGradient)"
-                                        />
-                                    </LineChart>
-                                </div>
-                            </div>
-                        ) : <p style={{ color: "red" }}>{error}</p>
+                            ))}
+                        </div>
+                        <div className="hourly-chart">
+                            <LineChart
+                                data={data?.map(hour => ({
+                                    time: hour.time,
+                                    temp: hour.temperature_2m
+                                }))}
+                                width={(data as HourlyWeather[])?.length * 110}
+                                height={100}
+                                margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+                            >
+                                <XAxis dataKey="time"
+                                    tick={false}
+                                    axisLine={false}
+                                    hide
+                                />
+                                <YAxis
+                                    unit="°C"
+                                    axisLine={false}
+                                    tick={false}
+                                    hide
+                                    domain={["dataMin - 2", "dataMax + 2"]} />
+                                <defs>
+                                    <linearGradient id="tempGradient" x1="0" y1="1" x2="0" y2="0">
+                                        <stop offset="0%" stopColor="#ccc" />
+                                        <stop offset="100%" stopColor="#ffd54a" />
+                                    </linearGradient>
+                                </defs>
+                                <Line
+                                    type="monotone"
+                                    dataKey="temp"
+                                    stroke="url(#tempGradient)"
+                                />
+                            </LineChart>
+                        </div>
+                    </div>
+                )
             }
         </>
     )
@@ -167,51 +167,65 @@ function getWindDegrees(dir: CardinalDirection): number {
     return (windDirectionToDegrees[dir] + 270) % 360
 }
 
-const CurrentItem = ({ data, unit }: CardProps) => {
+const CurrentItem = ({ data, unit, error, loading }: CardProps) => {
+    if (loading) {
+        return <p>Loading....</p>
+    }
+    
+    if (error) {
+        return <p style={{color: "red"}}>{error}</p>
+    }
+
     type WeatherVariable =
         | "relative_humidity"
         | "wind_speed"
         | "wind_direction"
         | "surface_pressure";
 
+
+    const { relative_humidity, wind_speed, wind_direction, surface_pressure } = data as CurrentWeather;
+    const modifiedData: Record<WeatherVariable, number | string> = {
+        relative_humidity,
+        wind_speed,
+        wind_direction,
+        surface_pressure
+    };
+
     const icons: Record<WeatherVariable, React.ReactNode> = {
         relative_humidity: <FontAwesomeIcon icon={faDroplet} />,
         wind_speed: <FontAwesomeIcon icon={faWind} />,
-        wind_direction: <FontAwesomeIcon icon={faArrowLeft} style={{ rotate: `${getWindDegrees(data.wind_direction as CardinalDirection)}deg` }} />,
+        wind_direction: <FontAwesomeIcon icon={faArrowLeft} style={{ rotate: `${getWindDegrees(wind_direction as CardinalDirection)}deg` }} />,
         surface_pressure: <FontAwesomeIcon icon={faWater} />
     };
 
-    const formatters_modified: Record<WeatherVariable, (value: number | CardinalDirection, unit?: Unit) => string> = {
-        relative_humidity: (value) => `${value as number}%`,
-        wind_speed: (value, unit = "metric") => formatters.wind_speed(value as number, unit) as string,
+    const formatters_modified: Record<WeatherVariable, (value: any, unit?: Unit) => string> = {
+        relative_humidity: (value) => `${value}%`,
+        wind_speed: (value, unit = "metric") => formatters.wind_speed(value, unit) as string,
         wind_direction: (value) => value as CardinalDirection,
-        surface_pressure: (value) => formatters.pressure(value as number) as string
-    }
-
-    const { apparent_temp, temperature, is_day, time, feels_like, ...modifiedData } = data
+        surface_pressure: (value) => formatters.pressure(value) as string
+    };
 
     return (
-        <>
-            <div className="today-conditions conditions-container">
-                {
-                    !modifiedData ? (
-                        <p>Loading...</p>
-                    ) : (
-                        Object.entries(modifiedData).map(([key, value]) => (
-                            <div key={key} className={key.replaceAll("_", "-").toLowerCase()}>
-                                <h4 className="variable-header">
-                                    {icons[key as WeatherVariable]}
-                                    {capitalizeFirstLetter(key.replaceAll("_", " "))}
-                                </h4>
-                                <h1>{typeof value === "string" ? formatters_modified[key as WeatherVariable](value as CardinalDirection) : formatters_modified[key as WeatherVariable](value as number, unit) ?? value}</h1>
-                            </div>
-                        ))
-                    )
-                }
-            </div>
-        </>
-    )
-}
+        <div className="today-conditions conditions-container">
+            {Object.entries(modifiedData).map(([key, value]) => {
+                const variableKey = key as WeatherVariable;
+                return (
+                    <div key={variableKey} className={variableKey.replaceAll("_", "-").toLowerCase()}>
+                        <h4 className="variable-header">
+                            {icons[variableKey]}
+                            {capitalizeFirstLetter(variableKey.replaceAll("_", " "))}
+                        </h4>
+                        <h1>
+                            {typeof value === "string"
+                                ? formatters_modified[variableKey](value)
+                                : formatters_modified[variableKey](value, unit)}
+                        </h1>
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
 
 interface DailyWeather {
     time: string;
@@ -224,13 +238,14 @@ interface DailyWeather {
 
 const DailyItem = ({ unit }: { unit: Unit }) => {
     const [data, loading, error] = useFetch<DailyWeather[]>("daily/forecast")
+
     return (
         <div className="daily-conditions conditions-container">
-            {loading && <p style={{ color: "black" }}>Loading...</p>}
+            {error && (
+                <p style={{ color: "red" }}>{error}</p>
+            )}
 
-            {error && <p style={{ color: "red" }}>{error}</p>}
-
-            {!loading && !error && data && data.map((day) => (
+            {!loading && !error && Array.isArray(data) && data.map((day) => (
                 <div className="daily-item">
                     <p className="forecast-time">{day.time}</p>
                     <p className="min-max-temp">
@@ -252,7 +267,7 @@ const DayNightTime = () => {
 
             {error && <p style={{ color: "red" }}>{error}</p>}
             {
-                !loading && !error && data &&
+                !loading && !error && Array.isArray(data) &&
                 <div className="timings">
                     <div>
                         <p>Sunrise</p>
@@ -269,11 +284,13 @@ const DayNightTime = () => {
 }
 
 interface CardProps {
-    data: CurrentWeather
+    data: CurrentWeather | null
+    error: string | null
+    loading: boolean
     unit: Unit
 }
 
-const Card = ({ data, unit }: CardProps) => {
+const Card = ({ data, unit, error, loading }: CardProps) => {
     const [open, setOpenStatus] = useState(false)
     return (
         <div className={`card-layout ${open ? "grow" : "collapse"}`}>
@@ -282,7 +299,7 @@ const Card = ({ data, unit }: CardProps) => {
                     <div className="card-toggle" onClick={() => setOpenStatus(!open)}></div>
                     <HourlyItem unit={unit} />
                     <DailyItem unit={unit} />
-                    <CurrentItem data={data} unit={unit} />
+                    <CurrentItem data={data} unit={unit} error={error} loading={loading} />
                     <DayNightTime />
                 </div>
             </section>

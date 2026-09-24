@@ -12,7 +12,7 @@ COPY ./backend/src/tests ./tests
 
 COPY ./backend/src/api ./src/api
 
-COPY ./backend/src/db/connection.py ./src/connection.py
+COPY ./backend/src/db/connection.py ./src/db/connection.py
 
 COPY ./tests/scripts/init_test_db.sh ./init_test_db.sh
 
