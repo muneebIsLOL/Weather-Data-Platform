@@ -1,14 +1,14 @@
-name: Terraform CI/CD
+name: Terraform Development CI/CD
 
 on:
   push:
     branches:
-      - "main"
+      - "dev"
     paths:
       - "terraform/environments/dev/**"
   pull_request:
     branches:
-      - "main"
+      - "dev"
     paths:
       - "terraform/environments/dev/**"
 
